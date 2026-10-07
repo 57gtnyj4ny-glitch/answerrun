@@ -67,7 +67,7 @@ jobs:
       - run: npm install
       - run: npm run ios:add
       - run: npx cap sync ios
-      - run: xcodebuild -workspace ios/App/App.xcworkspace -scheme App -sdk iphonesimulator -configuration Release -derivedDataPath ios/build CODE_SIGNING_ALLOWED=NO
+      - run: xcodebuild -project ios/App/App.xcodeproj -scheme App -sdk iphonesimulator -configuration Release -derivedDataPath ios/build CODE_SIGNING_ALLOWED=NO
       - uses: actions/upload-artifact@v4
         with:
           name: ios-simulator-app
