@@ -1,6 +1,6 @@
 {
-  "appId": "com.begiidumai.game",
-  "appName": "Беги и думай",
+  "appId": "com.answerrun.game",
+  "appName": "AnswerRun",
   "webDir": "app/www",
   "bundledWebRuntime": false
 }
