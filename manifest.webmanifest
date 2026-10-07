@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "AnswerRun",
+  "short_name": "AnswerRun",
+  "description": "Мобильный раннер с препятствиями, вопросами и наградами.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#171039",
+  "theme_color": "#34106f",
+  "icons": [
+    {
+      "src": "./icons/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/app-icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "name": "begi-i-dumai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Беги и думай — настольная и мобильная игра",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "desktop": "electron .",
+    "desktop:build": "electron-builder --publish never",
+    "mobile:prepare": "node scripts/prepare-mobile.cjs",
+    "mobile:sync": "npm run mobile:prepare && cap sync",
+    "android:add": "npm run mobile:prepare && cap add android",
+    "ios:add": "npm run mobile:prepare && cap add ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/core": "8.5.2",
+    "@capacitor/ios": "8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2",
+    "electron": "44.6.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.begiidumai.game",
+    "productName": "Беги и думай",
+    "directories": {
+      "output": "desktop-dist"
+    },
+    "files": [
+      "desktop/**/*",
+      "runner.html",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "games"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Game"
+    }
+  }
+}

@@ -1,0 +1,2280 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="theme-color" content="#34106f">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="AnswerRun">
+	<meta name="mobile-web-app-capable" content="yes">
+	<link rel="manifest" href="./manifest.webmanifest">
+	<link rel="icon" type="image/svg+xml" href="./icons/app-icon.svg">
+	<link rel="apple-touch-icon" sizes="180x180" href="./icons/app-icon-180.png">
+	<title>AnswerRun — игра</title>
+	<style>
+		:root {
+			color-scheme: light;
+			font-family: "Bahnschrift", "Aptos", "Segoe UI Variable", sans-serif;
+			color: #172d3b;
+			background: #34106f;
+			font-synthesis: none;
+			text-rendering: optimizeLegibility;
+			-webkit-tap-highlight-color: transparent;
+		}
+		* { box-sizing: border-box; }
+		body {
+			min-height: 100vh;
+			min-height: 100dvh;
+			margin: 0;
+			padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+			display: grid;
+			place-items: center;
+			background:
+				radial-gradient(ellipse at 12% 12%, #ff4fa544 0, transparent 30%),
+				radial-gradient(ellipse at 92% 38%, #16d9f344 0, transparent 32%),
+				radial-gradient(ellipse at 45% 100%, #ffbd3c33 0, transparent 38%),
+				linear-gradient(145deg, #171039, #34106f 54%, #14205c);
+		}
+		button { font: inherit; }
+		.game { width: min(100%, 520px); }
+		.game.is-hub { width: min(100%, 760px); min-height: 100vh; min-height: 100dvh; margin: 0 auto; padding: 22px 18px 30px; color: #fff; }
+		.game.is-hub > :not(.app-pages) { display: none !important; }
+		.app-pages { width: 100%; }
+		.app-page[hidden] { display: none !important; }
+		.app-page { animation: page-in 260ms ease both; }
+		@keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+		.app-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 24px; }
+		.app-brand { display: flex; align-items: center; gap: 10px; color: #fff; font-size: 13px; font-weight: 900; letter-spacing: .07em; }
+		.app-brand-mark { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 13px; color: white; font-size: 21px; background: linear-gradient(140deg, #ff538a, #8a52ef); box-shadow: 0 8px 24px #9e58ef55; }
+		.nav-links { display: flex; gap: 8px; }
+		.nav-link, .back-link {
+			min-height: 42px; padding: 0 14px; border: 1px solid #ffffff24; border-radius: 14px; background: #ffffff14;
+			color: #fff; font-size: 12px; font-weight: 850; cursor: pointer; box-shadow: 0 8px 24px #09051d44; backdrop-filter: blur(12px);
+		}
+		.nav-link:hover, .back-link:hover { background: #ffffff28; transform: translateY(-1px); }
+		.home-hero {
+			position: relative; overflow: hidden; padding: clamp(24px, 7vw, 48px); border-radius: 30px;
+			background: linear-gradient(130deg, #ffdd69 0%, #ff8c66 44%, #ed5b9b 100%);
+			color: #38244a; box-shadow: 0 22px 60px #dc638640;
+		}
+		.home-hero::after { content: "✦"; position: absolute; right: 7%; top: 8%; color: #fff7c5aa; font-size: clamp(70px, 18vw, 150px); transform: rotate(16deg); }
+		.hero-kicker, .page-kicker { margin: 0 0 10px; font-size: 11px; font-weight: 950; letter-spacing: .16em; text-transform: uppercase; }
+		.home-hero h1 { position: relative; z-index: 1; max-width: 440px; margin: 0 0 12px; font-size: clamp(38px, 10vw, 72px); line-height: .98; letter-spacing: -.06em; }
+		.home-hero p { position: relative; z-index: 1; max-width: 390px; margin: 0 0 22px; color: #603a51; font-size: 15px; line-height: 1.6; }
+		.hero-actions { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+		.hero-play {
+			min-height: 54px; padding: 0 24px; border: 0; border-radius: 17px; background: #33214f; color: #fff;
+			font-size: 15px; font-weight: 950; cursor: pointer; box-shadow: 0 6px 0 #201238, 0 14px 25px #48244b38;
+		}
+		.hero-play:active { transform: translateY(3px); box-shadow: 0 3px 0 #201238; }
+		.home-profile-link { color: #492c53; font-weight: 900; text-decoration: none; }
+		.home-highlights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+		.highlight-card, .hub-card {
+			padding: 18px; border: 1px solid #ffffff30; border-radius: 21px; background: #341c70;
+			box-shadow: 0 12px 32px #09051d55;
+		}
+		.highlight-card:nth-child(1) { background: linear-gradient(145deg, #08bdd0, #1766c7); }
+		.highlight-card:nth-child(2) { background: linear-gradient(145deg, #ff4c96, #a729d2); }
+		.highlight-card:nth-child(3) { background: linear-gradient(145deg, #ffbd36, #f16632); }
+		.highlight-value { display: block; margin-bottom: 4px; color: #fff; font-size: clamp(20px, 5vw, 28px); font-weight: 950; }
+		.highlight-label { color: #fffde0; font-size: 11px; font-weight: 800; }
+		.hub-section-title { margin: 25px 2px 12px; color: #fff; font-size: 20px; font-weight: 950; letter-spacing: -.03em; }
+		.feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+		.feature-card {
+			min-height: 144px; padding: 17px; border: 0; border-radius: 20px; text-align: left; cursor: pointer;
+			color: #30304e; box-shadow: 0 12px 28px #29426912; transition: transform 160ms ease;
+		}
+		.feature-card:hover { transform: translateY(-3px); }
+		.feature-card:nth-child(1) { background: linear-gradient(140deg, #a345f5, #6335ce); color: #fff; }
+		.feature-card:nth-child(2) { background: linear-gradient(140deg, #12d5c4, #087eae); color: #042a49; }
+		.feature-card:nth-child(3) { background: linear-gradient(140deg, #ffc83d, #ff743e); color: #49204d; }
+		.feature-card:nth-child(4) { background: linear-gradient(140deg, #31e7d0, #3267ed); color: #fff; }
+		.feature-icon { display: block; margin-bottom: 12px; font-size: 27px; }
+		.feature-title { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 950; }
+		.feature-copy { display: block; color: #fffde0; font-size: 11px; line-height: 1.45; }
+		.gesture-guide { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+		.gesture-step { min-height: 106px; padding: 15px 12px; border: 1px solid #ffffff2b; border-radius: 18px; background: linear-gradient(145deg, #422279, #271858); text-align: center; box-shadow: 0 10px 25px #09051d44; }
+		.gesture-icon { display: block; margin-bottom: 8px; color: #ffdf61; font-size: 25px; font-weight: 950; }
+		.gesture-name { display: block; color: #fff; font-size: 12px; font-weight: 900; }
+		.gesture-copy { display: block; margin-top: 4px; color: #d3c8ff; font-size: 10px; }
+		.page-heading { margin: 10px 0 7px; color: #fff; font-size: clamp(30px, 7vw, 44px); font-weight: 950; letter-spacing: -.05em; }
+		.page-kicker { color: #ffdf61 !important; }
+		.page-description { margin: 0 0 22px; color: #d4c8f4; font-size: 14px; line-height: 1.55; }
+		.profile-card { display: grid; gap: 18px; padding: clamp(20px, 6vw, 34px); border: 1px solid #ffffff3b; border-radius: 25px; background: linear-gradient(135deg, #7740e8, #d42d9a 56%, #ff8d36); box-shadow: 0 20px 50px #13082f66; }
+		.profile-avatar { display: grid; width: 82px; height: 82px; place-items: center; border-radius: 26px; background: #fff2; font-size: 44px; box-shadow: 0 10px 24px #35105c44; }
+		.profile-field { display: grid; gap: 8px; color: #fff; font-size: 12px; font-weight: 900; }
+		.profile-field input { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid #ffffff70; border-radius: 14px; outline: none; background: #31145699; color: #fff; font: inherit; }
+		.profile-field input::placeholder { color: #ead8ff; }
+		.profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+		.profile-stat { padding: 15px 10px; border: 1px solid #ffffff30; border-radius: 16px; background: #34125c66; text-align: center; }
+		.profile-stat strong { display: block; color: #ffdf61; font-size: 22px; }
+		.profile-stat span { color: #f3dcff; font-size: 10px; font-weight: 800; }
+		.shop-wallet { width: fit-content; margin: 0 0 16px; padding: 12px 18px; border: 1px solid #ffe77b66; border-radius: 16px; background: linear-gradient(120deg, #9a5b16, #663c92); color: #fff3a1; font-size: 19px; font-weight: 950; box-shadow: 0 8px 24px #09051d44; }
+		.skin-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+		.skin-card { display: grid; align-content: start; gap: 10px; padding: 16px; border: 1px solid #ffffff30; border-radius: 20px; background: linear-gradient(145deg, #422279, #271858); box-shadow: 0 12px 28px #09051d44; }
+		.skin-card.is-selected { outline: 2px solid #5af0d4; }
+		.skin-preview { display: grid; min-height: 104px; place-items: center; border-radius: 15px; background: radial-gradient(ellipse, #ffffff35, #ffffff08 70%); font-size: 62px; }
+		.skin-name { color: #fff; font-size: 15px; font-weight: 950; }
+		.skin-price { color: #ffdf61; font-size: 12px; font-weight: 850; }
+		.skin-action { min-height: 40px; border: 0; border-radius: 12px; background: linear-gradient(110deg, #714de1, #e24f9a); color: #fff; font: inherit; font-size: 12px; font-weight: 900; cursor: pointer; }
+		.skin-action:disabled { background: #ffffff1a; color: #c5b9ec; cursor: default; }
+		.hub-primary, .hub-secondary { min-height: 48px; padding: 0 18px; border: 0; border-radius: 15px; font-weight: 900; cursor: pointer; }
+		.hub-primary { background: linear-gradient(110deg, #714de1, #e24f9a); color: white; box-shadow: 0 6px 0 #7040ab; }
+		.hub-secondary { background: #ffffff1c; color: #fff; }
+		.leaderboard-list { display: grid; gap: 9px; padding: 0; list-style: none; }
+		.leaderboard-row { display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 12px; padding: 13px 15px; border: 1px solid #ffffff20; border-radius: 16px; background: linear-gradient(110deg, #382065, #25205d); box-shadow: 0 5px 18px #09051d44; }
+		.leaderboard-row.is-self { outline: 2px solid #ffdf61; background: linear-gradient(110deg, #6b3195, #393087); }
+		.leaderboard-rank { color: #ffdf61; font-size: 19px; font-weight: 950; }
+		.leaderboard-name { color: #fff; font-size: 13px; font-weight: 900; }
+		.leaderboard-date { display: block; margin-top: 3px; color: #c5b9ec; font-size: 10px; }
+		.leaderboard-score { color: #59f0dc; font-size: 17px; font-weight: 950; }
+		.empty-state { padding: 28px 18px; border-radius: 18px; background: #382065; color: #e1d5ff; text-align: center; line-height: 1.6; }
+		.local-note { margin: 14px 0 0; color: #c5b9ec; font-size: 11px; line-height: 1.5; }
+		.settings-page { padding: 22px; border: 1px solid #ffffff30; border-radius: 25px; background: linear-gradient(145deg, #32185f, #1f1a51); box-shadow: 0 12px 32px #09051d55; }
+		.settings-page .menu-group-title { color: #fff; }
+		.settings-page .menu-group-hint { color: #c5b9ec; }
+		.settings-page .choice-button { border-color: #ffffff30; background: linear-gradient(145deg, #4b3181, #30215f); color: #fff; }
+		.settings-page .choice-button:hover { border-color: #58e9e1; background: linear-gradient(145deg, #563993, #392773); }
+		.settings-page .choice-button[aria-pressed="true"] { border-color: #53f1d7; background: linear-gradient(145deg, #167d91, #3853bc); box-shadow: inset 0 0 0 1px #53f1d7; }
+		.settings-page .choice-description { color: #d5ccf3; }
+		.settings-page .menu-group { margin: 18px 0; }
+		.settings-page #main-menu-content > .card-kicker,
+		.settings-page #main-menu-content > h1,
+		.settings-page #main-menu-content > .card-copy { display: none; }
+		.settings-page .choice-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+		.settings-page .menu-group:last-of-type .choice-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+		.settings-page .primary-button { display: none; }
+		.game.is-hub .overlay { display: none; }
+		.game.is-immersive .controls { display: none; }
+		.game.is-immersive .game-options { display: flex; }
+		.game.is-immersive .playfield { touch-action: none; }
+		@media (max-width: 560px) {
+			.game.is-hub { padding: 14px 13px 24px; }
+			.app-nav { margin-bottom: 15px; }
+			.nav-link { min-height: 38px; padding: 0 10px; font-size: 10px; }
+			.app-brand { font-size: 11px; }
+			.home-highlights { gap: 8px; }
+			.highlight-card { padding: 13px 10px; }
+			.feature-grid { grid-template-columns: 1fr; }
+			.feature-card { min-height: auto; display: grid; grid-template-columns: 38px 1fr; column-gap: 10px; padding: 14px; }
+			.feature-icon { grid-row: span 2; margin: 0; }
+			.feature-title { align-self: end; }
+			.gesture-guide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+			.settings-page { padding: 14px; }
+			.settings-page .choice-grid,
+			.settings-page .menu-group:last-of-type .choice-grid { grid-template-columns: 1fr; }
+			.settings-page .choice-button { min-height: 56px; }
+			.skin-grid { grid-template-columns: 1fr; }
+		}
+		.topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+		.brand { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800; letter-spacing: .02em; }
+		.brand-mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 12px; background: #1877a8; color: #dff5ff; font-size: 18px; }
+		.pause-button {
+			width: 42px; height: 42px; border: 1px solid #d4e4eb; border-radius: 13px;
+			background: #fff; color: #176d98; font-size: 16px; font-weight: 800; cursor: pointer;
+		}
+		.pause-button:disabled { opacity: .45; cursor: default; }
+		.scorebar { display: grid; grid-template-columns: 1fr auto auto auto auto; align-items: center; gap: 12px; margin-bottom: 12px; }
+		.stat { display: grid; min-width: 0; gap: 3px; }
+		.score-label { color: #71828b; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+		.score, .level-value { font-size: 21px; font-weight: 900; font-variant-numeric: tabular-nums; }
+		.level-value { color: #176d98; }
+		.hearts { color: #e77b62; font-size: 18px; letter-spacing: 2px; white-space: nowrap; }
+		.record-value { color: #d28a2e; }
+		.game-options { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; color: #71838b; font-size: 12px; }
+		#run-settings { font-weight: 700; }
+		.track { height: 7px; overflow: hidden; border-radius: 9px; background: #dce9ef; margin-bottom: 12px; }
+		.track-fill { width: 0; height: 100%; border-radius: inherit; background: #36a8d6; transition: width 180ms ease; }
+		.playfield {
+			position: relative; overflow: hidden; border: 1px solid #d7e6ed; border-radius: 22px;
+			background: #d9f0fa; box-shadow: 0 20px 55px #17384c14;
+		}
+		canvas { display: block; width: 100%; height: auto; touch-action: none; }
+		.game.is-immersive {
+			position: fixed; z-index: 10; inset: 0; width: 100%; height: 100vh; height: 100dvh;
+			padding: 0; display: block; overflow: hidden;
+			background: #071a26;
+		}
+		.game.is-immersive .topline {
+			position: absolute; z-index: 5; top: max(12px, env(safe-area-inset-top));
+			right: max(14px, env(safe-area-inset-right)); margin: 0;
+		}
+		.game.is-immersive .brand { display: none; }
+		.game.is-immersive .pause-button {
+			width: 52px; height: 52px; border: 0; border-radius: 50%;
+			background: #071a2680; color: #effaff; font-size: 20px;
+			backdrop-filter: blur(8px); box-shadow: none;
+		}
+		.game.is-immersive .scorebar {
+			position: absolute; z-index: 5; top: max(14px, env(safe-area-inset-top));
+			left: max(16px, env(safe-area-inset-left)); display: flex; flex-direction: column;
+			align-items: flex-start; gap: 2px; margin: 0; padding: 0;
+			border: 0; border-radius: 0; background: transparent; color: #fff;
+		}
+		.game.is-immersive .scorebar .stat:not(:first-child) { display: none; }
+		.game.is-immersive .scorebar .stat { gap: 0; }
+		.game.is-immersive .score-label { color: #d4f7ff; font-size: 10px; }
+		.game.is-immersive .score { font-size: clamp(26px, 6vw, 38px); line-height: 1; text-shadow: 0 3px 12px #06233f88; }
+		.game.is-immersive .hearts { font-size: 20px; line-height: 1.1; text-shadow: 0 2px 10px #06233f88; }
+		.combo-label { display: none; color: #ffe58a; font-size: 11px; font-weight: 900; letter-spacing: .04em; text-shadow: 0 2px 8px #06233f88; }
+		.game.is-immersive .combo-label:not(:empty) { display: block; }
+		.game.is-immersive .game-options { display: none; }
+		.game.is-immersive .powerup-status { color: #ffd873; }
+		.game.is-immersive .track {
+			position: absolute; z-index: 5; right: max(16px, env(safe-area-inset-right));
+			bottom: max(12px, env(safe-area-inset-bottom)); left: max(16px, env(safe-area-inset-left));
+			height: 3px; margin: 0; border-radius: 0; background: #ffffff35;
+		}
+		.game.is-immersive .track-fill { background: linear-gradient(90deg, #42f5e6, #ffe45e, #ff6d8d); }
+		.game.is-immersive .playfield {
+			position: absolute; z-index: 1; inset: 0; display: block;
+			min-height: 0; border: 0; border-radius: 0; background: #133c50; box-shadow: none;
+		}
+		.game.is-immersive canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+		.game.is-immersive .prize-toast { top: max(76px, calc(env(safe-area-inset-top) + 62px)); }
+		.powerup-status { color: #d28a2e; font-weight: 900; }
+		.prize-toast {
+			position: absolute; z-index: 2; top: 12px; left: 50%; max-width: calc(100% - 24px);
+			transform: translate(-50%, -6px); padding: 7px 12px; border: 1px solid #ffffff35; border-radius: 999px;
+			background: #101b2c88; color: #ffffffd9; backdrop-filter: blur(8px);
+			font-size: 12px; font-weight: 800; text-align: center; opacity: 0; pointer-events: none;
+			box-shadow: 0 4px 14px #0003; transition: opacity 180ms ease, transform 180ms ease;
+		}
+		.prize-toast.is-visible { opacity: .72; transform: translate(-50%, 0); }
+		.game.is-immersive #left-button { border: 1px solid #6ce7ff99; background: linear-gradient(180deg, #159abc, #087086); color: #f1feff; box-shadow: 0 5px 0 #07505e, 0 10px 22px #00131e88; }
+		.game.is-immersive #jump-button { border: 1px solid #ffe28cbb; background: linear-gradient(180deg, #ffbd38, #ec7927); color: #40240a; box-shadow: 0 5px 0 #a64c18, 0 10px 22px #00131e88; }
+		.game.is-immersive #right-button { border: 1px solid #a7f08c99; background: linear-gradient(180deg, #66ca56, #279545); color: #f5fff1; box-shadow: 0 5px 0 #1c6932, 0 10px 22px #00131e88; }
+		.game.is-immersive #slide-button { border: 1px solid #d0b5ff99; background: linear-gradient(180deg, #a16bec, #7140bd); color: #fff8ff; box-shadow: 0 5px 0 #4c2a85, 0 10px 22px #00131e88; }
+		.game.is-immersive .jump-button:active { transform: translateY(3px); }
+		.game.is-immersive #slide-button.is-active { filter: brightness(1.3); box-shadow: 0 0 18px #c79affaa; }
+		.game.is-immersive .overlay { z-index: 20; }
+		.game.is-immersive .card { box-shadow: 0 24px 80px #00131f99; }
+		.game.is-immersive:fullscreen { width: 100%; height: 100vh; height: 100dvh; }
+		.overlay {
+			position: fixed; z-index: 5; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: 24px 16px;
+			background: #102d3b88; backdrop-filter: blur(6px);
+		}
+		.overlay[hidden] { display: none; }
+		.card {
+			width: min(100%, 560px); max-height: calc(100dvh - 40px); overflow-y: auto;
+			padding: 30px; border: 1px solid #dce9ee; border-radius: 24px;
+			background: #fbfeff; text-align: center; box-shadow: 0 24px 80px #0d2c3a40;
+		}
+		.card-kicker { margin: 0 0 8px; color: #1682b3; font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+		.card h1, .card h2 { margin: 0 0 10px; font-size: clamp(25px, 6vw, 34px); line-height: 1.08; letter-spacing: -.035em; }
+		.card-copy { margin: 0 auto 19px; max-width: 420px; color: #687d88; font-size: 14px; line-height: 1.6; }
+		.primary-button {
+			width: 100%; min-height: 50px; padding: 12px 18px; border: 0; border-radius: 13px;
+			background: #167ca8; color: white; font-size: 15px; font-weight: 800; cursor: pointer;
+			transition: background 150ms ease, transform 150ms ease;
+		}
+		.primary-button:hover { background: #106587; }
+		.primary-button:active, .answer-button:active { transform: scale(.98); }
+		.menu-group { margin: 22px 0; text-align: left; }
+		.menu-group-title { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 10px; font-size: 13px; font-weight: 800; }
+		.menu-group-hint { color: #758892; font-size: 11px; font-weight: 500; }
+		.choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+		.choice-button {
+			min-width: 0; min-height: 83px; padding: 12px 10px; border: 1px solid #d9e6eb; border-radius: 14px;
+			background: #f4f9fb; color: #25404e; text-align: left; cursor: pointer;
+			transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+		}
+		.choice-button:hover { border-color: #78bfdc; background: #edf8fc; }
+		.choice-button[aria-pressed="true"] { border-color: #2195c2; background: #e5f6fc; box-shadow: inset 0 0 0 1px #2195c2; }
+		.choice-name { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 900; }
+		.choice-description { display: block; color: #71838b; font-size: 10px; line-height: 1.4; }
+		.secondary-button {
+			width: 100%; min-height: 42px; margin-top: 9px; border: 1px solid #d7e4e9; border-radius: 12px;
+			background: transparent; color: #52707e; font-size: 13px; font-weight: 700; cursor: pointer;
+		}
+		.answers {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
+			margin-top: 18px;
+		}
+		.question-timer { display: grid; gap: 6px; margin: 15px 0 0; text-align: left; }
+		.question-timer-label { display: flex; justify-content: space-between; color: #71838b; font-size: 12px; font-weight: 800; }
+		.question-timer-track { height: 8px; overflow: hidden; border-radius: 9px; background: #dce9ef; }
+		.question-timer-fill { width: 100%; height: 100%; border-radius: inherit; background: #36a8d6; transition: width 100ms linear, background 150ms ease; }
+		.question-timer-fill.is-low { background: #df755c; }
+		.answer-button {
+			min-height: 54px; padding: 12px 13px; border: 1px solid #d9e6eb; border-radius: 12px;
+			background: #f4f9fb; color: #1e3541; text-align: left; font-size: 14px; font-weight: 700; cursor: pointer;
+			transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+		}
+		.answer-button:hover:not(:disabled) { border-color: #65b4d2; background: #edf8fc; }
+		.answer-button:focus-visible {
+			outline: 3px solid rgba(23, 124, 168, 0.22);
+			outline-offset: 2px;
+		}
+		.answer-button:disabled { cursor: default; }
+		.answer-button.is-correct { border-color: #54a9cd; background: #e1f4fb; color: #176d98; }
+		.answer-button.is-wrong { border-color: #dc8a73; background: #fbebe5; color: #9a493a; }
+		.feedback { min-height: 25px; margin: 12px 0 0; color: #687d88; font-size: 13px; font-weight: 700; }
+		.answer-hint { margin: 10px 0 0; color: #71838b; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+		@media (max-width: 520px) {
+			.answers { grid-template-columns: 1fr; }
+		}
+		.controls { display: none; }
+		.jump-button {
+			min-height: 62px; border: 0; border-radius: 16px; background: #d8f1fa; color: #176d98;
+			font-size: clamp(12px, 3.6vw, 16px); font-weight: 900; cursor: pointer; touch-action: manipulation;
+			box-shadow: 0 4px 0 #add9e8; transition: transform 100ms ease, box-shadow 100ms ease;
+		}
+		.jump-button:active { transform: translateY(3px); box-shadow: 0 1px 0 #add9e8; }
+		.jump-button:disabled { opacity: .5; cursor: default; }
+		#slide-button { background: #eee1ff; color: #6333a4; box-shadow: 0 4px 0 #cfb5ee; }
+		.pause-button:focus-visible, .jump-button:focus-visible, .choice-button:focus-visible, .primary-button:focus-visible, .secondary-button:focus-visible {
+			outline: 3px solid #1682b344; outline-offset: 2px;
+		}
+		@media (max-width: 480px) {
+			body { padding-right: 12px; padding-left: 12px; }
+			.playfield { border-radius: 17px; }
+			.game.is-immersive .scorebar { padding: 0; }
+			.game.is-immersive .pause-button { width: 48px; height: 48px; }
+			.card { padding: 21px 17px; }
+			.scorebar { grid-template-columns: 1fr 1fr auto; gap: 8px; }
+			.scorebar .stat:nth-child(3) { grid-column: 1; grid-row: 2; }
+			.scorebar .stat:nth-child(4) { grid-column: 2; grid-row: 2; }
+			.scorebar .hearts { grid-column: 3; grid-row: 2; justify-self: end; }
+			.score, .level-value { font-size: 18px; }
+			.card { padding: 23px 18px; }
+			.choice-grid { grid-template-columns: 1fr; }
+			.choice-button { min-height: 64px; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+		}
+	</style>
+</head>
+<body>
+	<main class="game is-hub" aria-label="Игра AnswerRun">
+		<div class="app-pages" id="app-pages">
+			<section class="app-page" id="home-page">
+				<nav class="app-nav" aria-label="Главная навигация">
+					<div class="app-brand"><span class="app-brand-mark" aria-hidden="true">↗</span>БЕГИ И ДУМАЙ</div>
+					<div class="nav-links">
+						<button class="nav-link" type="button" data-open-page="profile">👤 Профиль</button>
+						<button class="nav-link" type="button" data-open-page="competition">🏆 Рейтинг</button>
+					</div>
+				</nav>
+				<section class="home-hero">
+					<p class="hero-kicker">Забег начинается здесь</p>
+					<h1>Беги.<br>Думай.<br>Побеждай.</h1>
+					<p>Лови ритм, уворачивайся от препятствий и собирай награды. На iPhone открой игру в Safari, нажми «Поделиться» и выбери «На экран Домой».</p>
+					<div class="hero-actions">
+						<button class="hero-play" id="hub-play-button" type="button">В путь! &nbsp;➜</button>
+						<a class="home-profile-link" href="#" data-open-page="profile">Мой профиль ↗</a>
+					</div>
+				</section>
+				<div class="home-highlights" aria-label="Игровая статистика">
+					<div class="highlight-card"><span class="highlight-value" id="home-best-score">0</span><span class="highlight-label">лучший результат</span></div>
+					<div class="highlight-card"><span class="highlight-value" id="home-games-played">0</span><span class="highlight-label">забегов сыграно</span></div>
+					<div class="highlight-card"><span class="highlight-value" id="home-player-name">Бегун</span><span class="highlight-label">твой профиль</span></div>
+				</div>
+				<h2 class="hub-section-title">Выбери свой маршрут</h2>
+				<div class="feature-grid">
+					<button class="feature-card" type="button" data-open-page="settings"><span class="feature-icon">🎨</span><span class="feature-title">Тема и сложность</span><span class="feature-copy">Настрой вопросы и темп игры</span></button>
+					<button class="feature-card" type="button" data-open-page="profile"><span class="feature-icon">🪪</span><span class="feature-title">Профиль бегуна</span><span class="feature-copy">Имя, личные рекорды и прогресс</span></button>
+					<button class="feature-card" type="button" data-open-page="competition"><span class="feature-icon">🥇</span><span class="feature-title">Соревнования</span><span class="feature-copy">Сравни результаты забегов</span></button>
+					<button class="feature-card" type="button" data-open-page="shop"><span class="feature-icon">🛍️</span><span class="feature-title">Магазин образов</span><span class="feature-copy">Покупай костюмы за собранные монеты</span></button>
+				</div>
+				<h2 class="hub-section-title">Как играть — просто свайпай</h2>
+				<div class="gesture-guide" aria-label="Обучение управлению">
+					<div class="gesture-step"><span class="gesture-icon">↔</span><span class="gesture-name">Влево / вправо</span><span class="gesture-copy">Свайпни, чтобы сменить полосу</span></div>
+					<div class="gesture-step"><span class="gesture-icon">↑</span><span class="gesture-name">Прыжок</span><span class="gesture-copy">Свайп вверх через камни</span></div>
+					<div class="gesture-step"><span class="gesture-icon">↓</span><span class="gesture-name">Подкат</span><span class="gesture-copy">Свайп вниз под аркой</span></div>
+					<div class="gesture-step"><span class="gesture-icon">✦</span><span class="gesture-name">Собирай призы</span><span class="gesture-copy">Монеты, щиты и сердца</span></div>
+				</div>
+			</section>
+			<section class="app-page" id="profile-page" hidden>
+				<nav class="app-nav" aria-label="Навигация профиля"><button class="back-link" type="button" data-open-page="home">← На главную</button><div class="app-brand">👤 Профиль бегуна</div></nav>
+				<p class="page-kicker" style="color:#7956d9">Твои достижения</p>
+				<h1 class="page-heading">Твой профиль</h1>
+				<p class="page-description">Имя будет отображаться в локальном рейтинге на этом устройстве.</p>
+				<div class="profile-card">
+					<div class="profile-avatar" aria-hidden="true">🏃</div>
+					<label class="profile-field" for="profile-name">Имя бегуна<input id="profile-name" maxlength="20" autocomplete="nickname" placeholder="Например, Саша"></label>
+					<div class="profile-stats">
+						<div class="profile-stat"><strong id="profile-best">0</strong><span>рекорд</span></div>
+						<div class="profile-stat"><strong id="profile-games">0</strong><span>забегов</span></div>
+						<div class="profile-stat"><strong id="profile-total">0</strong><span>всего очков</span></div>
+					</div>
+					<button class="hub-primary" id="save-profile" type="button">Сохранить профиль</button>
+				</div>
+			</section>
+			<section class="app-page" id="competition-page" hidden>
+				<nav class="app-nav" aria-label="Навигация соревнований"><button class="back-link" type="button" data-open-page="home">← На главную</button><div class="app-brand">🏆 Соревнования</div></nav>
+				<p class="page-kicker" style="color:#dc8427">Бей рекорды</p>
+				<h1 class="page-heading">Таблица очков</h1>
+				<p class="page-description">Лучшие результаты забегов на этом устройстве. Сыграй ещё раз и поднимись выше.</p>
+				<div class="hub-card">
+					<ol class="leaderboard-list" id="leaderboard-list"></ol>
+					<p class="empty-state" id="leaderboard-empty" hidden>Пока нет результатов. Сыграй первый забег и займи верхнюю строчку!</p>
+					<p class="local-note">Сейчас таблица хранится в браузере этого устройства. Для общего онлайн-рейтинга понадобится подключить сервер.</p>
+				</div>
+			</section>
+			<section class="app-page" id="shop-page" hidden>
+				<nav class="app-nav" aria-label="Навигация магазина"><button class="back-link" type="button" data-open-page="home">← На главную</button><div class="app-brand">🛍️ Магазин бегуна</div></nav>
+				<p class="page-kicker">Твоя коллекция</p>
+				<h1 class="page-heading">Выбери образ</h1>
+				<p class="page-description">Собирай монеты во время забега и открывай новые костюмы. Купленные образы сохраняются на этом устройстве.</p>
+				<div class="shop-wallet">🪙 <span id="wallet-coins">0</span> монет</div>
+				<div class="skin-grid" id="skin-grid"></div>
+			</section>
+			<section class="app-page" id="settings-page" hidden>
+				<nav class="app-nav" aria-label="Навигация настроек"><button class="back-link" type="button" data-open-page="home">← На главную</button><div class="app-brand">⚙ Настройки забега</div></nav>
+				<div class="settings-page" id="settings-content"></div>
+				<button class="hub-primary" id="settings-play-button" type="button" style="width:100%;margin-top:14px">Начать забег ➜</button>
+			</section>
+		</div>
+		<header class="topline">
+			<div class="brand"><span class="brand-mark" aria-hidden="true">↗</span>БЕГИ И ДУМАЙ</div>
+			<button class="pause-button" id="pause-button" type="button" aria-label="Пауза" title="Пауза" disabled>Ⅱ</button>
+		</header>
+		<section class="scorebar" aria-label="Счёт игры">
+			<div class="stat"><span class="score-label">Счёт</span><span class="score" id="score">0</span><span class="combo-label" id="combo-label" aria-live="polite"></span></div>
+			<div class="stat"><span class="score-label">Рекорд</span><span class="score record-value" id="best-score">0</span></div>
+			<div class="stat"><span class="score-label">Уровень</span><span class="level-value" id="level">1</span></div>
+			<div class="stat"><span class="score-label">Тема</span><span class="level-value" id="programming-level">Основы</span></div>
+			<span class="hearts" id="hearts" aria-label="Три жизни">♥♥♥</span>
+		</section>
+		<div class="game-options">
+			<span id="run-settings">Основы · Обычный забег</span>
+			<span class="powerup-status" id="powerup-status"></span>
+		</div>
+		<div class="track" role="progressbar" aria-label="До следующего препятствия" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+			<div class="track-fill" id="track-fill"></div>
+		</div>
+		<section class="playfield" aria-label="Игровое поле">
+			<canvas id="game-canvas" width="420" height="640" aria-label="Уклоняйся от препятствий, переключая полосы"></canvas>
+			<div class="prize-toast" id="prize-toast" role="status" aria-live="polite"></div>
+			<div class="overlay" id="overlay">
+				<div class="card" id="card" role="dialog" aria-modal="true" aria-labelledby="card-title">
+					<div id="main-menu-content">
+						<p class="card-kicker">Тренажёр программиста</p>
+						<h1 id="card-title">AnswerRun</h1>
+						<p class="card-copy">Выбери тему вопросов и сложность забега. Обходи преграды, прыгай и кувыркайся под арками. Несколько чистых проходов подряд дают комбо и больше очков. Клавиши: ←/→ или A/D, прыжок — пробел/W, подкат — ↓/S.</p>
+						<div class="menu-group">
+							<p class="menu-group-title"><span>Твой уровень в программировании</span><span class="menu-group-hint">темы вопросов</span></p>
+							<div class="choice-grid" role="group" aria-label="Уровень программирования">
+								<button class="choice-button" type="button" data-programming-level="beginner" aria-pressed="true">
+									<span class="choice-name">Основы</span><span class="choice-description">Типы, условия, HTML, Git</span>
+								</button>
+								<button class="choice-button" type="button" data-programming-level="intermediate" aria-pressed="false">
+									<span class="choice-name">Средний</span><span class="choice-description">Функции, API, SQL, async</span>
+								</button>
+								<button class="choice-button" type="button" data-programming-level="advanced" aria-pressed="false">
+									<span class="choice-name">Продвинутый</span><span class="choice-description">Алгоритмы, память, архитектура</span>
+								</button>
+							</div>
+						</div>
+						<div class="menu-group">
+							<p class="menu-group-title"><span>Сложность самого забега</span><span class="menu-group-hint">скорость и препятствия</span></p>
+							<div class="choice-grid" role="group" aria-label="Сложность забега">
+								<button class="choice-button" type="button" data-run-difficulty="easy" aria-pressed="false">
+									<span class="choice-name">Лёгкая</span><span class="choice-description">Медленнее, больше времени</span>
+								</button>
+								<button class="choice-button" type="button" data-run-difficulty="normal" aria-pressed="true">
+									<span class="choice-name">Обычная</span><span class="choice-description">Сбалансированный темп</span>
+								</button>
+								<button class="choice-button" type="button" data-run-difficulty="hard" aria-pressed="false">
+									<span class="choice-name">Сложная</span><span class="choice-description">Быстрее и плотнее препятствия</span>
+								</button>
+								<button class="choice-button" type="button" data-run-difficulty="hardcore" aria-pressed="false">
+									<span class="choice-name">Хардкор</span><span class="choice-description">Одно сердце — права на ошибку нет</span>
+								</button>
+							</div>
+						</div>
+						<button class="primary-button" id="primary-button" type="button">Начать забег</button>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div class="controls">
+			<button class="jump-button" id="left-button" type="button" aria-label="Перейти на полосу влево" disabled>◀ ЛЕВО</button>
+			<button class="jump-button" id="jump-button" type="button" aria-label="Прыгнуть" disabled>ПРЫЖОК ↑</button>
+			<button class="jump-button" id="slide-button" type="button" aria-label="Проскользить под препятствием" disabled>ПОДКАТ ↓</button>
+			<button class="jump-button" id="right-button" type="button" aria-label="Перейти на полосу вправо" disabled>ПРАВО ▶</button>
+		</div>
+	</main>
+	<script>
+		'use strict';
+		const game = document.querySelector('.game');
+		const appPages = document.querySelector('#app-pages');
+		const settingsContent = document.querySelector('#settings-content');
+		const profileNameInput = document.querySelector('#profile-name');
+		const canvas = document.querySelector('#game-canvas');
+		const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+		const overlay = document.querySelector('#overlay');
+		const card = document.querySelector('#card');
+		const mainMenuContent = document.querySelector('#main-menu-content');
+		const primaryButton = document.querySelector('#primary-button');
+		const leftButton = document.querySelector('#left-button');
+		const jumpButton = document.querySelector('#jump-button');
+		const slideButton = document.querySelector('#slide-button');
+		const rightButton = document.querySelector('#right-button');
+		const pauseButton = document.querySelector('#pause-button');
+		const scoreLabel = document.querySelector('#score');
+		const bestScoreLabel = document.querySelector('#best-score');
+		const levelLabel = document.querySelector('#level');
+		const programmingLevelLabel = document.querySelector('#programming-level');
+		const heartsLabel = document.querySelector('#hearts');
+		const comboLabel = document.querySelector('#combo-label');
+		const runSettingsLabel = document.querySelector('#run-settings');
+		const powerupStatus = document.querySelector('#powerup-status');
+		const prizeToast = document.querySelector('#prize-toast');
+		const track = document.querySelector('.track');
+		const trackFill = document.querySelector('#track-fill');
+		const runner = { lane: 1, x: 210, y: 520, width: 42, height: 68, jumpHeight: 0, jumpVelocity: 0, jumpTime: 0, jumping: false, sliding: false, slideTime: 0 };
+		const questionTimeLimit = 15;
+		const slideDuration = 1.05;
+		const laneCount = 3;
+		const roadDepthDistance = 500;
+		const obstacleKinds = [
+			{ type: 'rock', height: 42, jumpable: true },
+			{ type: 'crate', height: 54, jumpable: true },
+			{ type: 'crystal', height: 48, jumpable: true },
+			{ type: 'barrier', height: 104, requiresLane: true },
+			{ type: 'cactus', height: 88, requiresLane: true },
+			{ type: 'arch', height: 74, slideable: true }
+		];
+		const difficulties = {
+			easy: { baseSpeed: 250, maxSpeed: 380, gapMin: 620, gapMax: 760, tallChance: 0.08 },
+			normal: { baseSpeed: 310, maxSpeed: 480, gapMin: 560, gapMax: 700, tallChance: 0.2 },
+			hard: { baseSpeed: 370, maxSpeed: 560, gapMin: 520, gapMax: 640, tallChance: 0.32 },
+			hardcore: { baseSpeed: 410, maxSpeed: 600, gapMin: 480, gapMax: 600, tallChance: 0.38 }
+		};
+		const programmingLevels = {
+			beginner: { label: 'Основы', description: 'Типы, условия, HTML, Git' },
+			intermediate: { label: 'Средний', description: 'Функции, API, SQL, async' },
+			advanced: { label: 'Продвинутый', description: 'Алгоритмы, память, архитектура' }
+		};
+		const runDifficultyLabels = { easy: 'Лёгкий', normal: 'Обычный', hard: 'Сложный', hardcore: 'Хардкор' };
+		const runnerSkins = [
+			{ id: 'starter', name: 'Искатель', price: 0, icon: '🏃', body: ['#e8ad68', '#b85f49', '#653b38'], pants: ['#617d86', '#304752'], accent: '#e6c579', hair: '#302923', detail: 'scarf' },
+			{ id: 'neon', name: 'Неон-рейсер', price: 30, icon: '🦸', body: ['#5bfff0', '#0ab7d4', '#2453c7'], pants: ['#e843ff', '#7026b3'], accent: '#fff36b', hair: '#211a55', detail: 'visor' },
+			{ id: 'forest', name: 'Лесной следопыт', price: 60, icon: '🧝', body: ['#c4ed6c', '#328b58', '#14533f'], pants: ['#9b6742', '#4a302f'], accent: '#ffce63', hair: '#42251c', detail: 'cap' },
+			{ id: 'royal', name: 'Королевский', price: 100, icon: '🤴', body: ['#ffe26b', '#9949e8', '#492caa'], pants: ['#ff647e', '#a62e85'], accent: '#fff1a6', hair: '#412253', detail: 'crown' },
+			{ id: 'winter', name: 'Полярный гонщик', price: 140, icon: '🥷', body: ['#f5ffff', '#56cfff', '#2262be'], pants: ['#71d9ff', '#253c88'], accent: '#ff7ab8', hair: '#172956', detail: 'hood' }
+		];
+		const questionBanks = {
+			beginner: [
+				{ question: 'Что вернёт typeof 42 в JavaScript?', answers: ['"number"', '"int"', '"float"', '"value"'], correct: 0 },
+				{ question: 'Какой оператор сравнивает значение и тип в JavaScript?', answers: ['=', '==', '===', '=>'], correct: 2 },
+				{ question: 'Какой HTML-тег создаёт ссылку?', answers: ['<link>', '<a>', '<href>', '<url>'], correct: 1 },
+				{ question: 'Какой CSS-селектор выбирает элемент с id="app"?', answers: ['.app', '#app', 'app', '*app'], correct: 1 },
+				{ question: 'Что делает команда git status?', answers: ['Показывает состояние рабочей копии', 'Удаляет ветку', 'Отправляет код на сервер', 'Создаёт коммит'], correct: 0 },
+				{ question: 'Какое значение означает «нет значения» в Python?', answers: ['null', 'undefined', 'None', 'empty'], correct: 2 },
+				{ question: 'Какой тип данных хранит последовательность элементов в Python?', answers: ['list', 'bool', 'int', 'None'], correct: 0 },
+				{ question: 'Что задаёт условие if?', answers: ['Повторение кода', 'Ветвление выполнения программы', 'Создание файла', 'Импорт библиотеки'], correct: 1 },
+				{ question: 'Какой HTML-элемент обозначает основную навигацию?', answers: ['<nav>', '<main>', '<aside>', '<footer>'], correct: 0 },
+				{ question: 'Для чего обычно используют CSS?', answers: ['Для оформления страницы', 'Для хранения данных', 'Для запросов к базе', 'Для контроля версий'], correct: 0 }
+			],
+			intermediate: [
+				{ question: 'Что возвращает Array.prototype.map()?', answers: ['Новый массив преобразованных элементов', 'Первый элемент', 'Всегда boolean', 'Исходный массив после удаления'], correct: 0 },
+				{ question: 'Что такое Promise в JavaScript?', answers: ['Представление результата асинхронной операции', 'Тип CSS-селектора', 'Синтаксис цикла', 'Таблица базы данных'], correct: 0 },
+				{ question: 'Какой HTTP-метод обычно используют для чтения ресурса?', answers: ['POST', 'GET', 'PATCH', 'DELETE'], correct: 1 },
+				{ question: 'Для чего нужен SQL JOIN?', answers: ['Соединять данные из таблиц', 'Сортировать файлы на диске', 'Создавать переменную', 'Запускать сервер'], correct: 0 },
+				{ question: 'Что делает команда git checkout -b feature/login?', answers: ['Создаёт ветку и переключается на неё', 'Удаляет все коммиты', 'Сливает ветки', 'Публикует сайт'], correct: 0 },
+				{ question: 'Какая структура данных работает по принципу FIFO?', answers: ['Стек', 'Очередь', 'Дерево', 'Множество'], correct: 1 },
+				{ question: 'Что означает HTTP-статус 404?', answers: ['Успешный запрос', 'Ресурс не найден', 'Ошибка авторизации', 'Сервер временно недоступен'], correct: 1 },
+				{ question: 'Что означает принцип DRY?', answers: ['Не дублировать одну и ту же логику', 'Не использовать функции', 'Хранить всё в одной базе', 'Повторять запросы'], correct: 0 },
+				{ question: 'Что делает async-функция в JavaScript?', answers: ['Всегда возвращает Promise', 'Блокирует браузер', 'Возвращает только строку', 'Запускает отдельный процесс ОС'], correct: 0 },
+				{ question: 'Какой SQL-клаузой фильтруют группы после GROUP BY?', answers: ['WHERE', 'HAVING', 'ORDER BY', 'LIMIT'], correct: 1 }
+			],
+			advanced: [
+				{ question: 'Какова временная сложность бинарного поиска в отсортированном массиве?', answers: ['O(n)', 'O(log n)', 'O(n²)', 'O(1) всегда'], correct: 1 },
+				{ question: 'Что такое замыкание (closure) в JavaScript?', answers: ['Функция вместе с доступным ей лексическим окружением', 'Удаление переменной сборщиком мусора', 'Способ создать класс CSS', 'Завершённый HTTP-запрос'], correct: 0 },
+				{ question: 'Какие задачи в браузере обычно выполняются после текущего стека вызовов: Promise.then или setTimeout(..., 0)?', answers: ['Сначала Promise.then (microtask)', 'Сначала setTimeout', 'Порядок всегда случайный', 'Обе выполняются параллельно'], correct: 0 },
+				{ question: 'Для чего обычно применяют индекс в базе данных?', answers: ['Ускорить поиск ценой места и стоимости обновлений', 'Зашифровать строки', 'Гарантировать уникальность любой колонки', 'Заменить транзакции'], correct: 0 },
+				{ question: 'Что означает идемпотентность HTTP-операции?', answers: ['Повтор операции даёт тот же итоговый эффект', 'Операция всегда выполняется мгновенно', 'Ответ не содержит тела', 'Запрос нельзя повторить'], correct: 0 },
+				{ question: 'Что такое race condition?', answers: ['Результат зависит от порядка выполнения конкурирующих операций', 'Алгоритм сортировки данных', 'Ошибка синтаксиса типов', 'Переполнение стека вызовов'], correct: 0 },
+				{ question: 'Зачем нужен виртуальный DOM в UI-библиотеках?', answers: ['Сопоставить изменения UI и обновить нужные части DOM', 'Заменить HTML-сервер', 'Ускорить сеть', 'Хранить пароли пользователей'], correct: 0 },
+				{ question: 'Какова средняя сложность поиска по ключу в hash map?', answers: ['O(1)', 'O(log n)', 'O(n log n)', 'O(n²)'], correct: 0 },
+				{ question: 'Что обеспечивает ACID-свойство атомарности транзакции?', answers: ['Все операции транзакции выполняются целиком или не применяются', 'Запросы всегда идут параллельно', 'Данные автоматически шифруются', 'Таблицы всегда отсортированы'], correct: 0 },
+				{ question: 'Что характерно для неизменяемого (immutable) объекта?', answers: ['Его состояние не меняют после создания', 'Он хранится только в базе данных', 'У него нет методов', 'Он всегда сериализован в JSON'], correct: 0 }
+			]
+		};
+		let state = 'ready';
+		let obstacles = [];
+		let distance = 0;
+		let level = 1;
+		let lives = 3;
+		let frameDelta = 1 / 60;
+		let programmingLevel = 'beginner';
+		let runDifficulty = 'normal';
+		let questions = questionBanks[programmingLevel];
+		let speed = difficulties[runDifficulty].baseSpeed;
+		let nextObstacleAt = 320;
+		let lastFrame = 0;
+		let animationFrame = 0;
+		let questionIndex = 0;
+		let bonusPoints = 0;
+		let comboCount = 0;
+		let bestCombo = 0;
+		let bestScore = readBestScore();
+		let backgroundOffset = 0;
+		let winterUnlocked = readWinterUnlocked();
+		let winterActive = winterUnlocked;
+		let nightActive = false;
+		let nightTriggered = false;
+		let nightRemaining = 0;
+		let activeQuestionButtons = [];
+		let obstacleCycleStart = 0;
+		let obstacleInterval = 320;
+		let questionTimer = 0;
+		let immersiveFullscreen = false;
+		let pickups = [];
+		let nextPickupAt = 500;
+		let shieldTime = 0;
+		let toastTimer = 0;
+		let touchStart = null;
+		const playerStorageKey = 'begi-i-dumai-player';
+		const leaderboardStorageKey = 'begi-i-dumai-leaderboard';
+		const cosmeticsStorageKey = 'begi-i-dumai-cosmetics';
+		const nightDurationSeconds = 18;
+		let playerStats = readPlayerStats();
+		let leaderboardEntries = readLeaderboard();
+		let cosmetics = readCosmetics();
+		let walletCoins = cosmetics.coins;
+
+		function readBestScore() {
+			try {
+				const value = Number(localStorage.getItem('begi-i-dumai-best') || 0);
+				return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+			} catch (error) {
+				console.warn('Не удалось прочитать рекорд игры.', error);
+				return 0;
+			}
+		}
+
+		function saveBestDistance(value) {
+			try {
+				localStorage.setItem('begi-i-dumai-best', String(value));
+			} catch (error) {
+				console.warn('Не удалось сохранить рекорд игры.', error);
+			}
+		}
+
+		function readWinterUnlocked() {
+			try {
+				return localStorage.getItem('begi-i-dumai-winter-unlocked') === 'true';
+			} catch (error) {
+				console.warn('Не удалось прочитать сезон игры.', error);
+				return false;
+			}
+		}
+
+		function saveWinterUnlocked() {
+			if (winterUnlocked) return;
+			winterUnlocked = true;
+			try {
+				localStorage.setItem('begi-i-dumai-winter-unlocked', 'true');
+			} catch (error) {
+				console.warn('Не удалось сохранить открытие зимнего сезона.', error);
+			}
+		}
+
+		function readPlayerStats() {
+			try {
+				const saved = JSON.parse(localStorage.getItem(playerStorageKey) || '{}');
+				return {
+					name: typeof saved.name === 'string' && saved.name.trim() ? saved.name.trim().slice(0, 20) : 'Бегун',
+					games: Number.isFinite(saved.games) ? Math.max(0, Math.floor(saved.games)) : 0,
+					totalScore: Number.isFinite(saved.totalScore) ? Math.max(0, Math.floor(saved.totalScore)) : 0
+				};
+			} catch (error) {
+				console.warn('Не удалось прочитать профиль игрока.', error);
+				return { name: 'Бегун', games: 0, totalScore: 0 };
+			}
+		}
+
+		function savePlayerStats() {
+			try {
+				localStorage.setItem(playerStorageKey, JSON.stringify(playerStats));
+			} catch (error) {
+				console.warn('Не удалось сохранить профиль игрока.', error);
+			}
+		}
+
+		function readLeaderboard() {
+			try {
+				const saved = JSON.parse(localStorage.getItem(leaderboardStorageKey) || '[]');
+				if (!Array.isArray(saved)) return [];
+				return saved.filter((entry) =>
+					entry && typeof entry.name === 'string' &&
+					Number.isFinite(entry.score) && typeof entry.date === 'string'
+				).slice(0, 20);
+			} catch (error) {
+				console.warn('Не удалось прочитать таблицу результатов.', error);
+				return [];
+			}
+		}
+
+		function saveLeaderboard() {
+			try {
+				localStorage.setItem(leaderboardStorageKey, JSON.stringify(leaderboardEntries));
+			} catch (error) {
+				console.warn('Не удалось сохранить таблицу результатов.', error);
+			}
+		}
+
+		function saveGameResult(score) {
+			playerStats.games += 1;
+			playerStats.totalScore += score;
+			savePlayerStats();
+			leaderboardEntries.push({
+				name: playerStats.name,
+				score,
+				date: new Date().toISOString()
+			});
+			leaderboardEntries.sort((left, right) => right.score - left.score || right.date.localeCompare(left.date));
+			leaderboardEntries = leaderboardEntries.slice(0, 20);
+			saveLeaderboard();
+		}
+
+		function readCosmetics() {
+			try {
+				const saved = JSON.parse(localStorage.getItem(cosmeticsStorageKey) || '{}');
+				const owned = Array.isArray(saved.owned)
+					? saved.owned.filter((id) => runnerSkins.some((skin) => skin.id === id))
+					: [];
+				if (!owned.includes('starter')) owned.push('starter');
+				const selected = runnerSkins.some((skin) => skin.id === saved.selected && owned.includes(skin.id))
+					? saved.selected
+					: 'starter';
+				return {
+					coins: Number.isFinite(saved.coins) ? Math.max(0, Math.floor(saved.coins)) : 0,
+					owned,
+					selected
+				};
+			} catch (error) {
+				console.warn('Не удалось прочитать монеты и образы игрока.', error);
+				return { coins: 0, owned: ['starter'], selected: 'starter' };
+			}
+		}
+
+		function saveCosmetics() {
+			try {
+				localStorage.setItem(cosmeticsStorageKey, JSON.stringify(cosmetics));
+			} catch (error) {
+				console.warn('Не удалось сохранить монеты и образы игрока.', error);
+			}
+		}
+
+		function renderShop() {
+			const wallet = document.querySelector('#wallet-coins');
+			const grid = document.querySelector('#skin-grid');
+			if (!wallet || !grid) return;
+			wallet.textContent = String(walletCoins);
+			grid.replaceChildren();
+			runnerSkins.forEach((skin) => {
+				const owned = cosmetics.owned.includes(skin.id);
+				const selected = cosmetics.selected === skin.id;
+				const card = document.createElement('article');
+				card.className = `skin-card${selected ? ' is-selected' : ''}`;
+				const preview = document.createElement('div');
+				preview.className = 'skin-preview';
+				preview.setAttribute('aria-hidden', 'true');
+				preview.textContent = skin.icon;
+				const name = document.createElement('strong');
+				name.className = 'skin-name';
+				name.textContent = skin.name;
+				const price = document.createElement('span');
+				price.className = 'skin-price';
+				price.textContent = owned ? 'Уже твой' : `🪙 ${skin.price} монет`;
+				const action = document.createElement('button');
+				action.className = 'skin-action';
+				action.type = 'button';
+				action.dataset.skinId = skin.id;
+				action.disabled = selected || (!owned && walletCoins < skin.price);
+				action.textContent = selected ? 'Надет' : owned ? 'Надеть' : 'Купить';
+				card.append(preview, name, price, action);
+				grid.append(card);
+			});
+		}
+
+		function renderHub() {
+			const name = playerStats.name || 'Бегун';
+			document.querySelector('#home-best-score').textContent = String(bestScore);
+			document.querySelector('#home-games-played').textContent = String(playerStats.games);
+			document.querySelector('#home-player-name').textContent = name;
+			document.querySelector('#profile-best').textContent = String(bestScore);
+			document.querySelector('#profile-games').textContent = String(playerStats.games);
+			document.querySelector('#profile-total').textContent = String(playerStats.totalScore);
+			profileNameInput.value = name === 'Бегун' ? '' : name;
+			renderShop();
+
+			const list = document.querySelector('#leaderboard-list');
+			const empty = document.querySelector('#leaderboard-empty');
+			list.replaceChildren();
+			empty.hidden = leaderboardEntries.length > 0;
+			leaderboardEntries.forEach((entry, index) => {
+				const row = document.createElement('li');
+				row.className = `leaderboard-row${entry.name === name ? ' is-self' : ''}`;
+				const rank = document.createElement('span');
+				rank.className = 'leaderboard-rank';
+				rank.textContent = `#${index + 1}`;
+				const details = document.createElement('span');
+				const player = document.createElement('span');
+				player.className = 'leaderboard-name';
+				player.textContent = entry.name;
+				const date = document.createElement('span');
+				date.className = 'leaderboard-date';
+				date.textContent = new Date(entry.date).toLocaleDateString('ru-RU');
+				details.append(player, date);
+				const score = document.createElement('span');
+				score.className = 'leaderboard-score';
+				score.textContent = String(entry.score);
+				row.append(rank, details, score);
+				list.append(row);
+			});
+		}
+
+		function showHubPage(pageName) {
+			appPages.hidden = false;
+			game.classList.add('is-hub');
+			game.classList.remove('is-immersive');
+			document.querySelectorAll('.app-page').forEach((page) => {
+				page.hidden = page.id !== `${pageName}-page`;
+			});
+			renderHub();
+			window.scrollTo(0, 0);
+		}
+
+		function clearQuestionTimer() {
+			if (questionTimer) {
+				window.clearInterval(questionTimer);
+				questionTimer = 0;
+			}
+		}
+
+		function roundedRect(x, y, width, height, radius) {
+			ctx.beginPath();
+			ctx.roundRect(x, y, width, height, radius);
+			ctx.fill();
+		}
+
+		function resizeCanvas() {
+			const bounds = canvas.getBoundingClientRect();
+			const width = Math.round(bounds.width);
+			const height = Math.round(bounds.height);
+			if (width > 0 && height > 0 && (canvas.width !== width || canvas.height !== height)) {
+				canvas.width = width;
+				canvas.height = height;
+				runner.y = canvas.height * .55;
+				drawScene();
+			}
+		}
+
+		function sceneScale() {
+			return Math.max(.78, canvas.height / 640);
+		}
+
+		function currentScore() {
+			return Math.floor(distance / 10) + bonusPoints;
+		}
+
+		function maxLivesForRun() {
+			return runDifficulty === 'hardcore' ? 1 : 3;
+		}
+
+		function runnerScale() {
+			return sceneScale() * 1.45;
+		}
+
+		function roadHorizon() {
+			return canvas.height * .22;
+		}
+
+		function projectedLaneX(lane, y) {
+			const depth = Math.max(0, Math.min(1, (y - roadHorizon()) / (canvas.height - roadHorizon())));
+			const roadHalfWidth = canvas.width * (.055 + depth * .43);
+			return canvas.width / 2 + (lane - 1) * roadHalfWidth * .67;
+		}
+
+		function projectedObstacleHeight(obstacle) {
+			const depth = Math.max(0, Math.min(1, (obstacle.y - roadHorizon()) / (canvas.height - roadHorizon())));
+			return obstacle.height * (.22 + depth * .82) * sceneScale();
+		}
+
+		function drawScene() {
+			const horizon = roadHorizon();
+			const roadBottom = canvas.height;
+			const roadTopHalf = canvas.width * .055;
+			const roadBottomHalf = canvas.width * .42;
+			const sky = ctx.createLinearGradient(0, 0, 0, horizon * 1.5);
+			sky.addColorStop(0, nightActive ? (winterActive ? '#172d63' : '#11133f') : winterActive ? '#65c7fa' : '#39b8ef');
+			sky.addColorStop(.55, nightActive ? (winterActive ? '#385b98' : '#30245f') : winterActive ? '#c5f3ff' : '#a7e8ff');
+			sky.addColorStop(1, nightActive ? (winterActive ? '#91b9d9' : '#8c4d8c') : winterActive ? '#effcff' : '#fff1a3');
+			ctx.fillStyle = sky;
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			const celestialX = canvas.width * .78;
+			const celestialY = horizon * .48;
+			const celestial = ctx.createRadialGradient(celestialX, celestialY, 2, celestialX, celestialY, canvas.width * .19);
+			celestial.addColorStop(0, nightActive ? '#d9f2ffdd' : '#fffde0');
+			celestial.addColorStop(.17, nightActive ? '#a9ddff66' : '#ffe76c');
+			celestial.addColorStop(1, nightActive ? '#a9ddff00' : '#ffe76c00');
+			ctx.fillStyle = celestial;
+			ctx.fillRect(0, 0, canvas.width, horizon);
+			ctx.fillStyle = nightActive ? '#eff8ff' : '#fff1a3';
+			ctx.beginPath();
+			ctx.arc(celestialX, celestialY, (nightActive ? 12 : 17) * sceneScale(), 0, Math.PI * 2);
+			ctx.fill();
+			if (nightActive) {
+				ctx.fillStyle = '#819bc7';
+				ctx.beginPath();
+				ctx.arc(celestialX + 5 * sceneScale(), celestialY - 2 * sceneScale(), 10 * sceneScale(), 0, Math.PI * 2);
+				ctx.fill();
+			}
+
+			const ground = ctx.createLinearGradient(0, horizon, 0, roadBottom);
+			ground.addColorStop(0, nightActive ? (winterActive ? '#91c8ec' : '#414078') : winterActive ? '#effdff' : '#9ce845');
+			ground.addColorStop(.2, nightActive ? (winterActive ? '#5794c6' : '#26325f') : winterActive ? '#b4eaff' : '#39c66a');
+			ground.addColorStop(1, nightActive ? (winterActive ? '#315b91' : '#111e44') : winterActive ? '#619cc6' : '#08754f');
+			ctx.fillStyle = ground;
+			ctx.fillRect(0, horizon, canvas.width, roadBottom - horizon);
+
+			ctx.fillStyle = winterActive ? (nightActive ? '#c6d9e6' : '#e6f2f3') : nightActive ? '#55556f' : '#68836c';
+			ctx.beginPath();
+			ctx.moveTo(0, horizon + 17);
+			ctx.bezierCurveTo(canvas.width * .16, horizon + 2, canvas.width * .22, horizon + 9, canvas.width * .37, horizon + 12);
+			ctx.bezierCurveTo(canvas.width * .51, horizon - 1, canvas.width * .64, horizon + 20, canvas.width * .78, horizon + 11);
+			ctx.bezierCurveTo(canvas.width * .88, horizon + 4, canvas.width * .94, horizon + 11, canvas.width, horizon + 7);
+			ctx.lineTo(canvas.width, horizon + 30);
+			ctx.lineTo(0, horizon + 30);
+			ctx.closePath();
+			ctx.fill();
+
+			for (let index = 0; index < 9; index += 1) {
+				const x = index * canvas.width / 8 - 6;
+				const width = Math.min(9 + (index % 3) * 2, canvas.width * .04);
+				const height = (12 + (index % 3) * 4) * sceneScale();
+				ctx.fillStyle = winterActive
+					? ['#4b7890', '#66899a', '#385f79'][index % 3]
+					: nightActive ? ['#33485b', '#3c4c65', '#293d50'][index % 3]
+						: ['#496b54', '#587557', '#3f6255'][index % 3];
+				ctx.beginPath();
+				ctx.moveTo(x, horizon + 23 - height);
+				ctx.quadraticCurveTo(x + width * .18, horizon + 22 - height * .35, x + width * .5, horizon + 25);
+				ctx.lineTo(x - width * .5, horizon + 25);
+				ctx.quadraticCurveTo(x - width * .18, horizon + 22 - height * .35, x, horizon + 23 - height);
+				ctx.closePath();
+				ctx.fill();
+				if (winterActive) {
+					ctx.fillStyle = '#e4f0f1';
+					ctx.beginPath();
+					ctx.moveTo(x, horizon + 23 - height);
+					ctx.lineTo(x + width * .2, horizon + 19);
+					ctx.lineTo(x - width * .18, horizon + 20);
+					ctx.fill();
+				}
+			}
+
+			drawRoadsideTrees(horizon, roadTopHalf, roadBottomHalf);
+
+			const road = ctx.createLinearGradient(0, horizon, 0, roadBottom);
+			road.addColorStop(0, winterActive ? '#698fb0' : nightActive ? '#44416f' : '#71818d');
+			road.addColorStop(.45, winterActive ? '#426c96' : nightActive ? '#302f55' : '#505c69');
+			road.addColorStop(1, winterActive ? '#233e68' : nightActive ? '#171c3c' : '#29313f');
+			ctx.fillStyle = road;
+			ctx.beginPath();
+			ctx.moveTo(canvas.width / 2 - roadTopHalf, horizon);
+			ctx.lineTo(canvas.width / 2 + roadTopHalf, horizon);
+			ctx.lineTo(canvas.width / 2 + roadBottomHalf, roadBottom);
+			ctx.lineTo(canvas.width / 2 - roadBottomHalf, roadBottom);
+			ctx.closePath();
+			ctx.fill();
+
+			for (const side of [-1, 1]) {
+				const topEdge = canvas.width / 2 + side * roadTopHalf;
+				const bottomEdge = canvas.width / 2 + side * roadBottomHalf;
+				const topBevel = Math.max(3 * sceneScale(), canvas.width * .012);
+				const bottomBevel = Math.max(12 * sceneScale(), canvas.width * .045);
+				const bevel = ctx.createLinearGradient(0, horizon, 0, roadBottom);
+				bevel.addColorStop(0, winterActive ? '#e9fcff' : nightActive ? '#7773ac' : '#b6c0c5');
+				bevel.addColorStop(.35, winterActive ? '#8ac9ed' : nightActive ? '#383760' : '#626f78');
+				bevel.addColorStop(1, winterActive ? '#3b6791' : nightActive ? '#171936' : '#242e3a');
+				ctx.fillStyle = bevel;
+				ctx.beginPath();
+				ctx.moveTo(topEdge, horizon);
+				ctx.lineTo(topEdge + side * topBevel, horizon);
+				ctx.lineTo(bottomEdge + side * bottomBevel, roadBottom);
+				ctx.lineTo(bottomEdge, roadBottom);
+				ctx.closePath();
+				ctx.fill();
+				ctx.strokeStyle = winterActive ? '#ffffffb8' : nightActive ? '#d7d1ff88' : '#ffffff66';
+				ctx.lineWidth = Math.max(1, sceneScale() * 2);
+				ctx.beginPath();
+				ctx.moveTo(topEdge + side * topBevel, horizon);
+				ctx.lineTo(bottomEdge + side * bottomBevel, roadBottom);
+				ctx.stroke();
+			}
+
+			const roadSheen = ctx.createLinearGradient(canvas.width * .25, horizon, canvas.width * .72, roadBottom);
+			roadSheen.addColorStop(0, '#ffffff00');
+			roadSheen.addColorStop(.5, winterActive ? '#c6f4ff18' : nightActive ? '#b2a7ff14' : '#ffffff0a');
+			roadSheen.addColorStop(1, '#00000020');
+			ctx.fillStyle = roadSheen;
+			ctx.beginPath();
+			ctx.moveTo(canvas.width / 2 - roadTopHalf, horizon);
+			ctx.lineTo(canvas.width / 2 + roadTopHalf, horizon);
+			ctx.lineTo(canvas.width / 2 + roadBottomHalf, roadBottom);
+			ctx.lineTo(canvas.width / 2 - roadBottomHalf, roadBottom);
+			ctx.closePath();
+			ctx.fill();
+
+			ctx.strokeStyle = winterActive ? '#c9f6ff' : nightActive ? '#ffe78b' : '#ffe873';
+			ctx.lineWidth = Math.max(1, 3 * sceneScale());
+			ctx.beginPath();
+			ctx.moveTo(canvas.width / 2 - roadTopHalf, horizon);
+			ctx.lineTo(canvas.width / 2 - roadBottomHalf, roadBottom);
+			ctx.moveTo(canvas.width / 2 + roadTopHalf, horizon);
+			ctx.lineTo(canvas.width / 2 + roadBottomHalf, roadBottom);
+			ctx.stroke();
+
+			const edgeWidth = Math.max(1.5, canvas.width * .0045);
+			ctx.lineWidth = edgeWidth;
+			ctx.strokeStyle = winterActive ? '#d9edf1' : nightActive ? '#aaa1ba' : '#93a49a';
+			ctx.beginPath();
+			ctx.moveTo(canvas.width / 2 - roadTopHalf, horizon);
+			ctx.lineTo(canvas.width / 2 - roadBottomHalf, roadBottom);
+			ctx.stroke();
+			ctx.strokeStyle = winterActive ? '#d9edf1' : nightActive ? '#aaa1ba' : '#93a49a';
+			ctx.beginPath();
+			ctx.moveTo(canvas.width / 2 + roadTopHalf, horizon);
+			ctx.lineTo(canvas.width / 2 + roadBottomHalf, roadBottom);
+			ctx.stroke();
+
+			const phase = (backgroundOffset / roadDepthDistance) % .14;
+			for (let lane = 0; lane < 2; lane += 1) {
+				for (let segment = 0; segment < 10; segment += 1) {
+					const depth = ((segment * .14 + phase) % 1);
+					const nextDepth = Math.min(depth + .065, 1);
+					const y1 = horizon + Math.pow(depth, 1.5) * (roadBottom - horizon);
+					const y2 = horizon + Math.pow(nextDepth, 1.5) * (roadBottom - horizon);
+					const x1 = canvas.width / 2 + (lane === 0 ? -1 : 1) * (roadTopHalf + depth * (roadBottomHalf - roadTopHalf)) / 3;
+					const x2 = canvas.width / 2 + (lane === 0 ? -1 : 1) * (roadTopHalf + nextDepth * (roadBottomHalf - roadTopHalf)) / 3;
+					const stripeWidth = (1.4 + depth * 3.2) * sceneScale();
+					ctx.fillStyle = `rgba(255, 235, 112, ${.45 + depth * .45})`;
+					ctx.beginPath();
+					ctx.moveTo(x1 - stripeWidth, y1);
+					ctx.lineTo(x1 + stripeWidth, y1);
+					ctx.lineTo(x2 + stripeWidth * 1.2, y2);
+					ctx.lineTo(x2 - stripeWidth * 1.2, y2);
+					ctx.closePath();
+					ctx.fill();
+				}
+			}
+
+			const characterScale = runnerScale();
+			runner.y = canvas.height * .55;
+			const targetX = projectedLaneX(runner.lane, runner.y + runner.height * characterScale * .6);
+			runner.x += (targetX - runner.x) * (1 - Math.exp(-14 * frameDelta));
+			obstacles.forEach(drawObstacle);
+			pickups.forEach(drawPickup);
+			drawRunner();
+		}
+
+		function drawRoadsideTrees(horizon, roadTopHalf, roadBottomHalf) {
+			const movement = (backgroundOffset / 900) % 1;
+			for (const side of [-1, 1]) {
+				for (let index = 0; index < 6; index += 1) {
+					const depth = ((index / 6 + movement) % 1) * .88 + .06;
+					const y = horizon + Math.pow(depth, 1.5) * (canvas.height - horizon);
+					const roadHalfWidth = roadTopHalf + depth * (roadBottomHalf - roadTopHalf);
+					const shoulderWidth = Math.max(6, canvas.width / 2 - roadHalfWidth);
+					const size = Math.min((11 + depth * 39) * sceneScale(), shoulderWidth * .42);
+					const center = canvas.width / 2 + side * (roadHalfWidth + size * 1.05);
+					if (center < -size || center > canvas.width + size) continue;
+
+					ctx.fillStyle = '#102c4266';
+					ctx.beginPath();
+					ctx.ellipse(center, y, size * .52, size * .13, 0, 0, Math.PI * 2);
+					ctx.fill();
+
+					const trunk = ctx.createLinearGradient(center - size * .12, 0, center + size * .12, 0);
+					trunk.addColorStop(0, '#422f43');
+					trunk.addColorStop(.5, '#a66b48');
+					trunk.addColorStop(1, '#382b45');
+					ctx.fillStyle = trunk;
+					roundedRect(center - size * .11, y - size * .42, size * .22, size * .45, size * .06);
+
+					const canopy = ctx.createLinearGradient(center - size * .55, y - size * 1.55, center + size * .4, y);
+					canopy.addColorStop(0, winterActive ? '#7894a0' : nightActive ? '#53665f' : '#6f8d67');
+					canopy.addColorStop(.5, winterActive ? '#547484' : nightActive ? '#3b5848' : '#4e744f');
+					canopy.addColorStop(1, winterActive ? '#364e60' : nightActive ? '#263f36' : '#315b3e');
+					ctx.fillStyle = canopy;
+					ctx.beginPath();
+					ctx.moveTo(center, y - size * 1.55);
+					ctx.quadraticCurveTo(center + size * .08, y - size * 1.18, center + size * .25, y - size * 1.05);
+					ctx.lineTo(center + size * .12, y - size * 1.05);
+					ctx.quadraticCurveTo(center + size * .25, y - size * .78, center + size * .46, y - size * .63);
+					ctx.lineTo(center + size * .27, y - size * .63);
+					ctx.quadraticCurveTo(center + size * .42, y - size * .34, center + size * .62, y - size * .2);
+					ctx.lineTo(center + size * .38, y - size * .18);
+					ctx.quadraticCurveTo(center + size * .25, y - size * .08, center, y - size * .08);
+					ctx.quadraticCurveTo(center - size * .25, y - size * .08, center - size * .38, y - size * .18);
+					ctx.lineTo(center - size * .62, y - size * .2);
+					ctx.quadraticCurveTo(center - size * .42, y - size * .34, center - size * .27, y - size * .63);
+					ctx.lineTo(center - size * .46, y - size * .63);
+					ctx.quadraticCurveTo(center - size * .25, y - size * .78, center - size * .12, y - size * 1.05);
+					ctx.lineTo(center - size * .25, y - size * 1.05);
+					ctx.quadraticCurveTo(center - size * .08, y - size * 1.18, center, y - size * 1.55);
+					ctx.closePath();
+					ctx.fill();
+
+					ctx.strokeStyle = winterActive ? '#e4f0f1' : '#a4b38a77';
+					ctx.lineWidth = Math.max(1, size * .045);
+					ctx.beginPath();
+					ctx.moveTo(center - size * .42, y - size * .21);
+					ctx.quadraticCurveTo(center - size * .12, y - size * .24, center + size * .16, y - size * .19);
+					ctx.moveTo(center - size * .3, y - size * .64);
+					ctx.quadraticCurveTo(center - size * .06, y - size * .67, center + size * .2, y - size * .62);
+					ctx.stroke();
+				}
+			}
+		}
+
+		function drawRunner() {
+			const scale = runnerScale();
+			const skin = runnerSkins.find((item) => item.id === cosmetics.selected) || runnerSkins[0];
+			slideButton.classList.toggle('is-active', runner.sliding);
+			const groundY = runner.y;
+			const jumpRatio = Math.min(1, runner.jumpHeight / 63);
+			const jumpProgress = Math.min(1, runner.jumpTime / .6);
+			const jumpTuck = runner.jumping ? Math.sin(Math.PI * jumpProgress) : 0;
+			const jumpWindup = runner.jumping ? Math.max(0, 1 - runner.jumpTime / .09) : 0;
+			const landingPrep = runner.jumping ? Math.min(1, Math.max(0, (jumpProgress - .82) / .18)) : 0;
+			const runCycle = Math.sin(distance / 7);
+			const slideProgress = runner.sliding ? 1 - runner.slideTime / slideDuration : 0;
+			const rawSlideBlend = runner.sliding ? Math.min(1, slideProgress / .15, (1 - slideProgress) / .15) : 0;
+			const slideBlend = rawSlideBlend * rawSlideBlend * (3 - 2 * rawSlideBlend);
+			const stride = runner.jumping || runner.sliding ? 0 : runCycle;
+			const legGradient = ctx.createLinearGradient(-12, 42, 12, 65);
+			legGradient.addColorStop(0, skin.pants[0]);
+			legGradient.addColorStop(1, skin.pants[1]);
+
+			ctx.fillStyle = `rgba(18, 35, 48, ${.3 - jumpRatio * .17})`;
+			ctx.beginPath();
+			ctx.ellipse(runner.x, groundY + 59 * scale, (22 - jumpRatio * 7) * scale, (5 - jumpRatio * 1.5) * scale, 0, 0, Math.PI * 2);
+			ctx.fill();
+			if (runner.sliding) {
+				const trail = ctx.createLinearGradient(runner.x - 36 * scale, groundY + 49 * scale, runner.x + 8 * scale, groundY + 49 * scale);
+				trail.addColorStop(0, '#d7a5ff00');
+				trail.addColorStop(1, '#d7a5ff66');
+				ctx.fillStyle = trail;
+				ctx.beginPath();
+				ctx.ellipse(runner.x - 14 * scale, groundY + 49 * scale, 24 * scale, 3 * scale, 0, 0, Math.PI * 2);
+				ctx.fill();
+			}
+
+			ctx.save();
+			ctx.translate(runner.x, groundY - runner.jumpHeight * scale + slideBlend * 7 * scale + Math.sin(distance / 11) * (runner.jumping || runner.sliding ? 0 : 1.2) * scale);
+			ctx.scale(scale, scale);
+			if (runner.sliding) {
+				const rollProgress = Math.max(0, Math.min(1, (slideProgress - .12) / .76));
+				const rollAngle = -Math.PI * 2 * rollProgress;
+				const projectedHeight = Math.cos(rollAngle);
+				const depthOffset = Math.sin(rollAngle) * 5;
+				ctx.translate(0, 31 + depthOffset);
+				ctx.scale(1, projectedHeight);
+				ctx.translate(0, -31);
+			}
+			const bodyDrop = slideBlend * 7 + jumpWindup * 3 + landingPrep * 2;
+			const torsoLean = runner.jumping ? -.08 - jumpTuck * .08 + landingPrep * .18 : slideBlend * .16 - stride * .035;
+
+			function limb(fromX, fromY, toX, toY, color, thickness) {
+				ctx.strokeStyle = color;
+				ctx.lineWidth = thickness;
+				ctx.lineCap = 'round';
+				ctx.lineJoin = 'round';
+				ctx.beginPath();
+				ctx.moveTo(fromX, fromY);
+				ctx.lineTo(toX, toY);
+				ctx.stroke();
+			}
+
+			function shoe(x, y, rotation) {
+				ctx.save();
+				ctx.translate(x, y);
+				ctx.rotate(rotation);
+				const shoe = ctx.createLinearGradient(-7, -3, 8, 3);
+				shoe.addColorStop(0, '#314552');
+				shoe.addColorStop(1, '#8db3bc');
+				ctx.fillStyle = shoe;
+				roundedRect(-8, -3.5, 17, 7, 3);
+				ctx.fillStyle = '#d6dedc';
+				ctx.fillRect(-7, 2.5, 16, 1.4);
+				ctx.strokeStyle = skin.accent;
+				ctx.lineWidth = .8;
+				ctx.beginPath();
+				ctx.moveTo(-3, -1);
+				ctx.lineTo(4, 1);
+				ctx.stroke();
+				ctx.restore();
+			}
+
+			ctx.save();
+			ctx.rotate(torsoLean);
+
+			const hipY = 43 + bodyDrop;
+			const strideReach = runner.jumping ? 0 : stride * 4;
+			const leftKnee = runner.jumping
+				? { x: -7 - jumpTuck, y: hipY + 8 - jumpTuck * 4 + landingPrep * 4 }
+				: runner.sliding
+					? { x: -8, y: 51 }
+					: { x: -7 - strideReach * .2, y: 53 + Math.max(0, stride) * 2 };
+			const rightKnee = runner.jumping
+				? { x: 7 + jumpTuck, y: hipY + 7 - jumpTuck * 4 + landingPrep * 4 }
+				: runner.sliding
+					? { x: 8, y: 51 }
+					: { x: 7 + strideReach * .2, y: 53 + Math.max(0, -stride) * 2 };
+			const leftFoot = runner.jumping
+				? { x: -8 - jumpTuck, y: 62 - jumpTuck * 5 + landingPrep * 5 }
+				: runner.sliding
+					? { x: -10, y: 59 }
+					: { x: -7 - strideReach * .35, y: 63 + Math.max(0, stride) * 5 };
+			const rightFoot = runner.jumping
+				? { x: 8 + jumpTuck, y: 62 - jumpTuck * 5 + landingPrep * 5 }
+				: runner.sliding
+					? { x: 10, y: 59 }
+					: { x: 7 + strideReach * .35, y: 63 + Math.max(0, -stride) * 5 };
+
+			limb(-6, hipY, leftKnee.x, leftKnee.y, skin.pants[0], 8);
+			limb(leftKnee.x, leftKnee.y, leftFoot.x, leftFoot.y, skin.pants[1], 6.5);
+			limb(6, hipY, rightKnee.x, rightKnee.y, skin.pants[0], 8);
+			limb(rightKnee.x, rightKnee.y, rightFoot.x, rightFoot.y, skin.pants[1], 6.5);
+			shoe(leftFoot.x + 1, leftFoot.y, runner.sliding ? -.08 : stride * .12);
+			shoe(rightFoot.x + 1, rightFoot.y, runner.sliding ? .08 : -stride * .12);
+
+			ctx.save();
+			ctx.translate(0, bodyDrop);
+			const shoulderY = 25;
+			const armSwing = runner.jumping ? 0 : stride * 3;
+			const leftElbow = runner.sliding
+				? { x: -9, y: shoulderY + 5 }
+				: runner.jumping
+					? { x: -14, y: shoulderY + 1 }
+					: { x: -14, y: shoulderY + 9 + armSwing };
+			const rightElbow = runner.sliding
+				? { x: 9, y: shoulderY + 5 }
+				: runner.jumping
+					? { x: 14, y: shoulderY + 1 }
+					: { x: 14, y: shoulderY + 9 - armSwing };
+			const leftHand = runner.sliding
+				? { x: -5, y: shoulderY + 12 }
+				: runner.jumping
+					? { x: -18, y: shoulderY - 4 - jumpRatio * 3 }
+					: { x: -16, y: shoulderY + 17 + armSwing * 1.5 };
+			const rightHand = runner.sliding
+				? { x: 5, y: shoulderY + 12 }
+				: runner.jumping
+					? { x: 18, y: shoulderY - 4 - jumpRatio * 3 }
+					: { x: 16, y: shoulderY + 17 - armSwing * 1.5 };
+			limb(-12, shoulderY, leftElbow.x, leftElbow.y, skin.body[2], 6.5);
+			limb(leftElbow.x, leftElbow.y, leftHand.x, leftHand.y, '#d99568', 4.5);
+			limb(12, shoulderY, rightElbow.x, rightElbow.y, skin.body[0], 6.5);
+			limb(rightElbow.x, rightElbow.y, rightHand.x, rightHand.y, '#d99568', 4.5);
+			ctx.fillStyle = '#d99568';
+			ctx.beginPath();
+			ctx.arc(leftHand.x, leftHand.y, 2.4, 0, Math.PI * 2);
+			ctx.arc(rightHand.x, rightHand.y, 2.4, 0, Math.PI * 2);
+			ctx.fill();
+
+			ctx.fillStyle = '#ac7351';
+			roundedRect(-4, 12, 8, 10, 3);
+			const torso = ctx.createLinearGradient(-15, 18, 14, 47);
+			torso.addColorStop(0, skin.body[0]);
+			torso.addColorStop(.55, skin.body[1]);
+			torso.addColorStop(1, skin.body[2]);
+			ctx.fillStyle = torso;
+			ctx.beginPath();
+			ctx.moveTo(-10, 19);
+			ctx.quadraticCurveTo(-14, 20, -15, 28);
+			ctx.lineTo(-11, 43);
+			ctx.quadraticCurveTo(0, 48, 11, 43);
+			ctx.lineTo(15, 28);
+			ctx.quadraticCurveTo(14, 20, 10, 19);
+			ctx.closePath();
+			ctx.fill();
+			ctx.fillStyle = '#ffffff42';
+			ctx.beginPath();
+			ctx.moveTo(-9, 21);
+			ctx.quadraticCurveTo(-13, 28, -9, 39);
+			ctx.lineTo(-4, 40);
+			ctx.lineTo(-5, 22);
+			ctx.closePath();
+			ctx.fill();
+			ctx.fillStyle = skin.accent;
+			ctx.beginPath();
+			roundedRect(-7, 27, 14, 10, 3);
+			ctx.fill();
+			ctx.fillStyle = '#2b353b88';
+			ctx.fillRect(-1, 28, 2, 8);
+			ctx.strokeStyle = '#ffffff55';
+			ctx.lineWidth = .8;
+			ctx.beginPath();
+			ctx.moveTo(-10, 22);
+			ctx.lineTo(-6, 42);
+			ctx.moveTo(10, 22);
+			ctx.lineTo(6, 42);
+			ctx.stroke();
+			ctx.fillStyle = legGradient;
+			roundedRect(-9, 41, 18, 5, 2);
+
+			ctx.fillStyle = '#c8875d';
+			ctx.beginPath();
+			ctx.ellipse(0, 8, 9.5, 11.5, 0, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.fillStyle = '#9b6245';
+			ctx.beginPath();
+			ctx.ellipse(-10, 9, 2, 3, 0, 0, Math.PI * 2);
+			ctx.ellipse(10, 9, 2, 3, 0, 0, Math.PI * 2);
+			ctx.fill();
+			const hair = ctx.createLinearGradient(-10, -4, 10, 16);
+			hair.addColorStop(0, skin.hair);
+			hair.addColorStop(1, '#171b1c');
+			ctx.fillStyle = hair;
+			ctx.beginPath();
+			ctx.moveTo(-10, 12);
+			ctx.quadraticCurveTo(-13, -1, -7, -5);
+			ctx.quadraticCurveTo(0, -9, 8, -4);
+			ctx.quadraticCurveTo(13, 0, 10, 12);
+			ctx.lineTo(6, 16);
+			ctx.quadraticCurveTo(0, 11, -6, 16);
+			ctx.closePath();
+			ctx.fill();
+			ctx.strokeStyle = '#ffffff26';
+			ctx.lineWidth = .9;
+			ctx.beginPath();
+			ctx.moveTo(-6, -2);
+			ctx.quadraticCurveTo(-2, 2, -5, 8);
+			ctx.moveTo(3, -3);
+			ctx.quadraticCurveTo(7, 2, 5, 10);
+			ctx.stroke();
+
+			ctx.fillStyle = skin.accent;
+			if (skin.detail === 'crown') {
+				ctx.beginPath();
+				ctx.moveTo(-8, 0);
+				ctx.lineTo(-7, -7);
+				ctx.lineTo(-2, -2);
+				ctx.lineTo(2, -8);
+				ctx.lineTo(6, -2);
+				ctx.lineTo(9, -6);
+				ctx.lineTo(9, 2);
+				ctx.closePath();
+				ctx.fill();
+			} else if (skin.detail === 'cap' || skin.detail === 'hood') {
+				ctx.beginPath();
+				ctx.ellipse(0, 5, 13, 7, 0, Math.PI, Math.PI * 2);
+				ctx.lineTo(15, 7);
+				ctx.lineTo(-12, 8);
+				ctx.closePath();
+				ctx.fill();
+			} else if (skin.detail === 'visor') {
+				ctx.globalAlpha = .82;
+				roundedRect(-10, 8, 20, 5, 2.5);
+				ctx.globalAlpha = 1;
+			}
+			ctx.restore();
+			ctx.restore();
+			ctx.restore();
+		}
+
+		function drawPickup(pickup) {
+			const scale = sceneScale();
+			const depth = Math.max(0, Math.min(1, (pickup.y - roadHorizon()) / (canvas.height - roadHorizon())));
+			const size = (10 + depth * 13) * scale;
+			const center = projectedLaneX(pickup.lane, pickup.y);
+			const bob = Math.sin(distance / 18 + pickup.lane) * 3 * scale;
+			const y = pickup.y - size + bob;
+			ctx.fillStyle = '#24394a66';
+			ctx.beginPath();
+			ctx.ellipse(center, pickup.y, size * .85, size * .23, 0, 0, Math.PI * 2);
+			ctx.fill();
+
+			if (pickup.type === 'coin') {
+				const coin = ctx.createLinearGradient(center - size, y, center + size, y);
+				coin.addColorStop(0, '#ff9d19');
+				coin.addColorStop(.4, '#fff27a');
+				coin.addColorStop(1, '#f18b13');
+				ctx.fillStyle = coin;
+				ctx.beginPath();
+				ctx.ellipse(center, y, size * .7, size, Math.sin(distance / 30) * .4, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.strokeStyle = '#fff8b2';
+				ctx.lineWidth = Math.max(1, size * .12);
+				ctx.beginPath();
+				ctx.ellipse(center, y, size * .38, size * .68, Math.sin(distance / 30) * .4, 0, Math.PI * 2);
+				ctx.stroke();
+				return;
+			}
+
+			if (pickup.type === 'heart') {
+				ctx.fillStyle = '#ff4380';
+				ctx.beginPath();
+				ctx.moveTo(center, y + size * .82);
+				ctx.bezierCurveTo(center - size * 1.7, y - size * .05, center - size * .9, y - size, center, y - size * .36);
+				ctx.bezierCurveTo(center + size * .9, y - size, center + size * 1.7, y - size * .05, center, y + size * .82);
+				ctx.fill();
+				ctx.fillStyle = '#ffffffaa';
+				ctx.beginPath();
+				ctx.arc(center - size * .35, y - size * .45, size * .16, 0, Math.PI * 2);
+				ctx.fill();
+				return;
+			}
+
+			const shield = ctx.createLinearGradient(center - size, y - size, center + size, y + size);
+			shield.addColorStop(0, '#f2a7ff');
+			shield.addColorStop(.5, '#a46bff');
+			shield.addColorStop(1, '#4de5ff');
+			ctx.fillStyle = shield;
+			ctx.beginPath();
+			ctx.moveTo(center, y - size);
+			ctx.lineTo(center + size * .82, y - size * .58);
+			ctx.lineTo(center + size * .68, y + size * .36);
+			ctx.lineTo(center, y + size);
+			ctx.lineTo(center - size * .68, y + size * .36);
+			ctx.lineTo(center - size * .82, y - size * .58);
+			ctx.closePath();
+			ctx.fill();
+			ctx.strokeStyle = '#ffffff';
+			ctx.lineWidth = Math.max(1, size * .12);
+			ctx.stroke();
+		}
+
+		function drawObstacle(obstacle) {
+			const scale = sceneScale();
+			const height = projectedObstacleHeight(obstacle);
+			const width = obstacle.width * height / obstacle.height;
+			const center = projectedLaneX(obstacle.lane, obstacle.y);
+			const x = center - width / 2;
+			const y = obstacle.y - height;
+			const side = Math.max(2 * scale, width * .2);
+
+			ctx.fillStyle = '#101f2780';
+			ctx.beginPath();
+			ctx.ellipse(center, obstacle.y, width * .72, Math.max(3 * scale, height * .1), 0, 0, Math.PI * 2);
+			ctx.fill();
+			if (obstacle.type === 'arch') {
+				const postWidth = width * .18;
+				const postHeight = height * .84;
+				const postGradient = ctx.createLinearGradient(x, 0, x + postWidth, 0);
+				postGradient.addColorStop(0, obstacle.winterTheme ? '#25547a' : '#51301f');
+				postGradient.addColorStop(.5, obstacle.winterTheme ? '#8be7ff' : '#9c6031');
+				postGradient.addColorStop(1, obstacle.winterTheme ? '#28608e' : '#634022');
+				ctx.fillStyle = postGradient;
+				roundedRect(x + width * .08, obstacle.y - postHeight, postWidth, postHeight, postWidth * .28);
+				roundedRect(x + width * .74, obstacle.y - postHeight, postWidth, postHeight, postWidth * .28);
+				const beamY = y + height * .06;
+				const beamGradient = ctx.createLinearGradient(x, beamY, x + width, beamY + height * .22);
+				beamGradient.addColorStop(0, obstacle.winterTheme ? '#e6fbff' : '#78ba55');
+				beamGradient.addColorStop(.5, obstacle.winterTheme ? '#64c9f2' : '#326f43');
+				beamGradient.addColorStop(1, obstacle.winterTheme ? '#316a9d' : '#194b39');
+				ctx.fillStyle = beamGradient;
+				roundedRect(x, beamY, width, height * .25, height * .1);
+				ctx.fillStyle = obstacle.winterTheme ? '#f6ffff' : '#d0ef8b';
+				ctx.fillRect(x + width * .2, beamY + height * .1, width * .6, Math.max(2 * scale, height * .035));
+				return;
+			}
+
+			if (obstacle.type === 'rock') {
+				const rock = ctx.createLinearGradient(x, y, x + width, obstacle.y);
+				rock.addColorStop(0, obstacle.winterTheme ? '#ffffff' : '#b9d17b');
+				rock.addColorStop(.35, obstacle.winterTheme ? '#b8edff' : '#71834e');
+				rock.addColorStop(1, obstacle.winterTheme ? '#4f91bc' : '#394a38');
+				ctx.fillStyle = rock;
+				ctx.beginPath();
+				ctx.moveTo(x, obstacle.y - height * .25);
+				ctx.lineTo(x + width * .2, y + height * .18);
+				ctx.lineTo(x + width * .53, y);
+				ctx.lineTo(x + width * .82, y + height * .2);
+				ctx.lineTo(x + width, obstacle.y - height * .3);
+				ctx.lineTo(x + width * .72, obstacle.y);
+				ctx.lineTo(x + width * .18, obstacle.y);
+				ctx.closePath();
+				ctx.fill();
+				ctx.fillStyle = obstacle.winterTheme ? '#ffffffc9' : '#d7ef9b99';
+				ctx.beginPath();
+				ctx.moveTo(x + width * .2, y + height * .18);
+				ctx.lineTo(x + width * .53, y);
+				ctx.lineTo(x + width * .45, y + height * .58);
+				ctx.lineTo(x + width * .28, y + height * .62);
+				ctx.closePath();
+				ctx.fill();
+				return;
+			}
+
+			if (obstacle.type === 'crystal') {
+				if (!obstacle.winterTheme) {
+					const mushroomGradient = ctx.createLinearGradient(x, y, x + width, obstacle.y);
+					mushroomGradient.addColorStop(0, '#ffbddb');
+					mushroomGradient.addColorStop(.5, '#d74f7c');
+					mushroomGradient.addColorStop(1, '#783969');
+					ctx.fillStyle = '#2d503a';
+					roundedRect(center - width * .09, y + height * .38, width * .18, height * .58, width * .08);
+					ctx.fillStyle = mushroomGradient;
+					ctx.beginPath();
+					ctx.ellipse(center, y + height * .4, width * .48, height * .3, 0, Math.PI, Math.PI * 2);
+					ctx.lineTo(center + width * .48, y + height * .42);
+					ctx.ellipse(center, y + height * .42, width * .48, height * .22, 0, 0, Math.PI);
+					ctx.closePath();
+					ctx.fill();
+					ctx.fillStyle = '#fff1d8';
+					for (let dot = -1; dot <= 1; dot += 1) {
+						ctx.beginPath();
+						ctx.arc(center + dot * width * .2, y + height * .31, Math.max(1, width * .045), 0, Math.PI * 2);
+						ctx.fill();
+					}
+					return;
+				}
+				const crystal = ctx.createLinearGradient(x, y, x + width, obstacle.y);
+				crystal.addColorStop(0, '#d5ffff');
+				crystal.addColorStop(.35, '#38f2de');
+				crystal.addColorStop(1, '#3476ff');
+				ctx.fillStyle = crystal;
+				ctx.beginPath();
+				ctx.moveTo(center, y);
+				ctx.lineTo(x + width * .86, y + height * .33);
+				ctx.lineTo(x + width * .7, obstacle.y);
+				ctx.lineTo(x + width * .3, obstacle.y);
+				ctx.lineTo(x + width * .12, y + height * .33);
+				ctx.closePath();
+				ctx.fill();
+				ctx.fillStyle = '#ffffffaa';
+				ctx.beginPath();
+				ctx.moveTo(center, y + height * .08);
+				ctx.lineTo(center, obstacle.y - height * .12);
+				ctx.lineTo(x + width * .3, obstacle.y);
+				ctx.lineTo(x + width * .12, y + height * .33);
+				ctx.closePath();
+				ctx.fill();
+				return;
+			}
+
+			if (obstacle.type === 'barrier') {
+				const postWidth = width * .13;
+				const postHeight = height * .62;
+				const post = ctx.createLinearGradient(x, 0, x + postWidth, 0);
+				post.addColorStop(0, obstacle.winterTheme ? '#285477' : '#442b1d');
+				post.addColorStop(.5, obstacle.winterTheme ? '#82dfff' : '#a56837');
+				post.addColorStop(1, obstacle.winterTheme ? '#254b70' : '#52321e');
+				ctx.fillStyle = post;
+				roundedRect(x + width * .12, obstacle.y - postHeight, postWidth, postHeight, postWidth * .2);
+				roundedRect(x + width * .75, obstacle.y - postHeight, postWidth, postHeight, postWidth * .2);
+				const beamY = y + height * .3;
+				ctx.fillStyle = obstacle.winterTheme ? '#9fe8ff' : '#9b6338';
+				roundedRect(x, beamY, width, height * .23, height * .06);
+				ctx.save();
+				ctx.beginPath();
+				ctx.roundRect(x, beamY, width, height * .23, height * .06);
+				ctx.clip();
+				ctx.strokeStyle = obstacle.winterTheme ? '#eaffff' : '#d69a59';
+				ctx.lineWidth = Math.max(2 * scale, width * .09);
+				for (let stripe = -2; stripe < 9; stripe += 1) {
+					ctx.beginPath();
+					ctx.moveTo(x + stripe * width * .22, beamY + height * .25);
+					ctx.lineTo(x + stripe * width * .22 + height * .25, beamY);
+					ctx.stroke();
+				}
+				ctx.restore();
+				ctx.fillStyle = obstacle.winterTheme ? '#ffffff' : '#f0c987';
+				ctx.beginPath();
+				ctx.arc(center, beamY + height * .12, Math.max(2 * scale, width * .055), 0, Math.PI * 2);
+				ctx.fill();
+				return;
+			}
+
+			if (obstacle.type === 'cactus') {
+				const stumpGradient = ctx.createLinearGradient(x, y, x + width, obstacle.y);
+				stumpGradient.addColorStop(0, obstacle.winterTheme ? '#b9f3ff' : '#a96a3c');
+				stumpGradient.addColorStop(.5, obstacle.winterTheme ? '#559cc7' : '#75432b');
+				stumpGradient.addColorStop(1, obstacle.winterTheme ? '#32628f' : '#402d28');
+				ctx.fillStyle = stumpGradient;
+				roundedRect(center - width * .28, y + height * .22, width * .56, height * .75, width * .1);
+				ctx.fillStyle = obstacle.winterTheme ? '#f2fdff' : '#c3e184';
+				ctx.beginPath();
+				ctx.ellipse(center, y + height * .24, width * .3, height * .12, 0, Math.PI, Math.PI * 2);
+				ctx.lineTo(center + width * .3, y + height * .27);
+				ctx.ellipse(center, y + height * .27, width * .3, height * .08, 0, 0, Math.PI);
+				ctx.closePath();
+				ctx.fill();
+				ctx.strokeStyle = obstacle.winterTheme ? '#e4fbff' : '#d7a16a';
+				ctx.lineWidth = Math.max(1, width * .035);
+				ctx.beginPath();
+				ctx.ellipse(center, y + height * .27, width * .17, height * .055, 0, 0, Math.PI * 2);
+				ctx.stroke();
+				return;
+			}
+
+			if (obstacle.type === 'crate') {
+				const log = ctx.createLinearGradient(x, y, x + width, obstacle.y);
+				log.addColorStop(0, obstacle.winterTheme ? '#f5ffff' : '#e0b56d');
+				log.addColorStop(.38, obstacle.winterTheme ? '#a9eaff' : '#9a6034');
+				log.addColorStop(1, obstacle.winterTheme ? '#477fb0' : '#523624');
+				ctx.fillStyle = log;
+				roundedRect(x + side * .2, y + side, width - side * .2, height - side, side * .35);
+				ctx.fillStyle = obstacle.winterTheme ? '#ffffff' : '#69422a';
+				ctx.beginPath();
+				ctx.ellipse(x + side * .2, obstacle.y - height * .14, Math.max(2, side * .36), Math.max(2, side * .3), 0, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.strokeStyle = obstacle.winterTheme ? '#b9f2ff' : '#d5a064';
+				ctx.lineWidth = Math.max(1, scale * 2);
+				ctx.beginPath();
+				ctx.ellipse(x + side * .2, obstacle.y - height * .14, Math.max(1, side * .19), Math.max(1, side * .16), 0, 0, Math.PI * 2);
+				ctx.stroke();
+				if (obstacle.winterTheme) {
+					ctx.fillStyle = '#f7ffff';
+					ctx.beginPath();
+					ctx.ellipse(center, y + side * .6, width * .48, side * .55, 0, Math.PI, Math.PI * 2);
+					ctx.fill();
+				}
+				return;
+			}
+
+			ctx.fillStyle = obstacle.winterTheme ? '#5686aa' : '#8f3d1e';
+			ctx.beginPath();
+			ctx.moveTo(x + width, y + side);
+			ctx.lineTo(x + width + side, y);
+			ctx.lineTo(x + width + side, obstacle.y - side);
+			ctx.lineTo(x + width, obstacle.y);
+			ctx.closePath();
+			ctx.fill();
+			ctx.fillStyle = '#ffdc77';
+			ctx.beginPath();
+			ctx.moveTo(x, y + side);
+			ctx.lineTo(x + side, y);
+			ctx.lineTo(x + width + side, y);
+			ctx.lineTo(x + width, y + side);
+			ctx.closePath();
+			ctx.fill();
+			const front = ctx.createLinearGradient(x, y, x + width, y);
+			front.addColorStop(0, '#c54d18');
+			front.addColorStop(.45, '#ff9e31');
+			front.addColorStop(1, '#cf4814');
+			ctx.fillStyle = front;
+			roundedRect(x, y + side, width, Math.max(1, height - side), Math.max(2, side * .28));
+			ctx.strokeStyle = '#ffe1a2';
+			ctx.lineWidth = Math.max(1, 2 * scale);
+			ctx.strokeRect(x + width * .17, y + side + height * .16, width * .66, height * .62);
+		}
+
+		function updateDisplay() {
+			const score = currentScore();
+			scoreLabel.textContent = String(score);
+			comboLabel.textContent = comboCount > 0 ? `КОМБО ×${comboCount} · лучший ×${bestCombo}` : '';
+			bestScoreLabel.textContent = String(bestScore);
+			level = Math.floor(distance / 3500) + 1;
+			levelLabel.textContent = String(level);
+			programmingLevelLabel.textContent = programmingLevels[programmingLevel].label;
+			const weatherLabel = nightActive ? `Ночь 🌙 ${Math.ceil(nightRemaining)}с` : winterActive ? 'Зима ❄' : 'День ☀';
+			runSettingsLabel.textContent = `${programmingLevels[programmingLevel].label} · ${runDifficultyLabels[runDifficulty]} забег · ${weatherLabel}`;
+			heartsLabel.textContent = '♥'.repeat(lives) + '♡'.repeat(maxLivesForRun() - lives);
+			heartsLabel.setAttribute('aria-label', `${lives} ${lives === 1 ? 'жизнь' : lives < 5 ? 'жизни' : 'жизней'}`);
+			powerupStatus.textContent = shieldTime > 0 ? `Щит ${shieldTime.toFixed(1)}с` : '';
+			const progress = Math.min(100, Math.max(0, ((distance - obstacleCycleStart) / obstacleInterval) * 100));
+			trackFill.style.width = `${progress}%`;
+			track.setAttribute('aria-valuenow', String(Math.round(progress)));
+		}
+
+		function startGame() {
+			if (animationFrame) cancelAnimationFrame(animationFrame);
+			clearQuestionTimer();
+			appPages.hidden = true;
+			game.classList.remove('is-hub');
+			game.classList.add('is-immersive');
+			if (!document.fullscreenElement && typeof game.requestFullscreen === 'function') {
+				game.requestFullscreen().then(() => {
+					immersiveFullscreen = document.fullscreenElement === game;
+					resizeCanvas();
+				}).catch((error) => {
+					console.warn('Не удалось открыть полноэкранный режим. Игра продолжит работу в полноэкранном окне страницы.', error);
+				});
+			}
+			resizeCanvas();
+			distance = 0;
+			winterActive = winterUnlocked;
+			nightActive = false;
+			nightTriggered = false;
+			nightRemaining = 0;
+			bonusPoints = 0;
+			comboCount = 0;
+			bestCombo = 0;
+			lives = maxLivesForRun();
+			level = 1;
+			questions = questionBanks[programmingLevel];
+			speed = difficulties[runDifficulty].baseSpeed;
+			nextObstacleAt = 320;
+			obstacleCycleStart = 0;
+			obstacleInterval = 320;
+			obstacles = [];
+			pickups = [];
+			nextPickupAt = 500;
+			shieldTime = 0;
+			window.clearTimeout(toastTimer);
+			prizeToast.classList.remove('is-visible');
+			questionIndex = 0;
+			runner.lane = 1;
+			runner.x = canvas.width / 2;
+			runner.y = canvas.height * .55;
+			runner.jumpHeight = 0;
+			runner.jumpVelocity = 0;
+			runner.jumpTime = 0;
+			runner.jumping = false;
+			runner.sliding = false;
+			runner.slideTime = 0;
+			slideButton.classList.remove('is-active');
+			state = 'running';
+			overlay.hidden = true;
+			leftButton.disabled = false;
+			jumpButton.disabled = false;
+			slideButton.disabled = false;
+			rightButton.disabled = false;
+			pauseButton.disabled = false;
+			lastFrame = performance.now();
+			updateDisplay();
+			animationFrame = requestAnimationFrame(gameLoop);
+		}
+
+		function gameLoop(timestamp) {
+			if (state !== 'running') return;
+			const delta = Math.min((timestamp - lastFrame) / 1000, .04);
+			lastFrame = timestamp;
+			frameDelta = delta || 1 / 60;
+			distance += speed * delta;
+			if (!nightTriggered && currentScore() >= 5700) {
+				nightTriggered = true;
+				nightActive = true;
+				nightRemaining = nightDurationSeconds;
+				saveWinterUnlocked();
+			} else if (nightActive) {
+				nightRemaining = Math.max(0, nightRemaining - delta);
+				if (nightRemaining === 0) nightActive = false;
+			}
+			level = Math.floor(distance / 3500) + 1;
+			const difficulty = difficulties[runDifficulty];
+			speed = Math.min(difficulty.maxSpeed, difficulty.baseSpeed + distance * .012);
+			backgroundOffset += speed * delta;
+			shieldTime = Math.max(0, shieldTime - delta);
+			runner.slideTime = Math.max(0, runner.slideTime - delta);
+			runner.sliding = runner.slideTime > 0;
+			const contactY = runner.y + runner.height * runnerScale() * .9;
+
+			if (distance >= nextObstacleAt) {
+				const roll = Math.random();
+				let availableKinds;
+				if (roll < .24) {
+					availableKinds = obstacleKinds.filter((kind) => kind.slideable);
+				} else if (roll < .24 + difficulty.tallChance) {
+					availableKinds = obstacleKinds.filter((kind) => kind.requiresLane);
+				} else {
+					availableKinds = obstacleKinds.filter((kind) => kind.jumpable);
+				}
+				const kind = availableKinds[Math.floor(Math.random() * availableKinds.length)];
+				const lane = Math.floor(Math.random() * laneCount);
+				obstacles.push({ ...kind, lane, depth: 0, y: roadHorizon(), winterTheme: winterActive, width: kind.type === 'barrier' ? 112 : kind.type === 'arch' ? 82 : 48 });
+				obstacleCycleStart = distance;
+				const levelGapReduction = Math.min((level - 1) * 8, 40);
+				const gap = difficulty.gapMin + Math.random() * (difficulty.gapMax - difficulty.gapMin) - levelGapReduction;
+				obstacleInterval = gap;
+				nextObstacleAt = distance + obstacleInterval;
+			}
+			obstacles.forEach((obstacle) => {
+				obstacle.depth = Math.min(1.5, obstacle.depth + speed * delta / roadDepthDistance);
+				obstacle.y = roadHorizon() + Math.pow(obstacle.depth, 1.5) * (canvas.height - roadHorizon());
+			});
+			obstacles.forEach((obstacle) => {
+				if (obstacle.passed || obstacle.y <= contactY + 24 * sceneScale()) return;
+				obstacle.passed = true;
+				comboCount += 1;
+				bestCombo = Math.max(bestCombo, comboCount);
+				const cleanPassBonus = 10 + Math.min(comboCount - 1, 10) * 5;
+				bonusPoints += cleanPassBonus;
+				if (comboCount % 5 === 0) showPrize(`Комбо ×${comboCount}! +${cleanPassBonus} очков 🔥`);
+			});
+			obstacles = obstacles.filter((obstacle) => obstacle.depth <= 1.12);
+			obstacles.forEach((obstacle) => {
+				if (obstacle.warned || obstacle.lane !== runner.lane || obstacle.y < contactY - 130 * sceneScale()) return;
+				obstacle.warned = true;
+				showPrize(obstacle.slideable ? 'Арка впереди — подкат ↓' : obstacle.jumpable ? 'Низкое препятствие — прыгай ↑' : 'Препятствие — смени полосу ← →');
+			});
+			if (distance >= nextPickupAt) {
+				const typeRoll = Math.random();
+				const type = typeRoll < .68 ? 'coin' : typeRoll < .86 ? 'shield' : 'heart';
+				pickups.push({ type, lane: Math.floor(Math.random() * laneCount), y: roadHorizon() });
+				nextPickupAt = distance + 560 + Math.random() * 360;
+			}
+			pickups.forEach((pickup) => { pickup.y += speed * delta * sceneScale(); });
+			pickups = pickups.filter((pickup) => pickup.y < canvas.height + 40 * sceneScale());
+
+			pickups = pickups.filter((pickup) => {
+				const inPickupRange = pickup.y >= contactY - 18 * sceneScale() && pickup.y <= contactY + 18 * sceneScale();
+				if (pickup.lane !== runner.lane || !inPickupRange) return true;
+				if (pickup.type === 'coin') {
+					bonusPoints += 50;
+					cosmetics.coins += 1;
+					walletCoins = cosmetics.coins;
+					saveCosmetics();
+					renderShop();
+					showPrize('Монета: +50 очков · +1 в кошелёк 🪙');
+				} else if (pickup.type === 'shield') {
+					shieldTime = 8;
+					showPrize('Щит на 8 секунд 🛡');
+				} else if (lives < maxLivesForRun()) {
+					lives += 1;
+					showPrize('Дополнительная жизнь ♥');
+				} else {
+					bonusPoints += 100;
+					showPrize('Сердце +100 ♥');
+				}
+				return false;
+			});
+
+			if (runner.jumping) {
+				runner.jumpTime += delta;
+				runner.jumpVelocity += 1400 * delta;
+				runner.jumpHeight -= runner.jumpVelocity * delta;
+				if (runner.jumpHeight <= 0 && runner.jumpVelocity > 0) {
+					runner.jumpHeight = 0;
+					runner.jumpVelocity = 0;
+					runner.jumpTime = 0;
+					runner.jumping = false;
+				}
+			}
+			if (runner.sliding && runner.jumping) {
+				runner.slideTime = 0;
+				runner.sliding = false;
+			}
+
+			const hit = obstacles.find((obstacle) => {
+				const inCollisionZone = obstacle.y >= contactY - 24 * sceneScale() && obstacle.y <= contactY + 24 * sceneScale();
+				const actionFailed =
+					obstacle.requiresLane ||
+					(obstacle.jumpable && runner.jumpHeight * runnerScale() < projectedObstacleHeight(obstacle) * .85) ||
+					(obstacle.slideable && !runner.sliding);
+				return !obstacle.hit && obstacle.lane === runner.lane && inCollisionZone && actionFailed;
+			});
+			if (hit) {
+				hit.hit = true;
+				comboCount = 0;
+				obstacles = [];
+				obstacleCycleStart = distance;
+				obstacleInterval = 320;
+				nextObstacleAt = distance + obstacleInterval;
+				if (shieldTime > 0) {
+					shieldTime = 0;
+					showPrize('Щит спас от столкновения!');
+					drawScene();
+					updateDisplay();
+					animationFrame = requestAnimationFrame(gameLoop);
+					return;
+				}
+				openQuestion();
+				drawScene();
+				updateDisplay();
+				return;
+			}
+
+			drawScene();
+			updateDisplay();
+			animationFrame = requestAnimationFrame(gameLoop);
+		}
+
+		function showOverlay(kicker, title, copy, buttonText, action, secondaryText, secondaryAction) {
+			card.replaceChildren();
+			const kickerElement = document.createElement('p');
+			kickerElement.className = 'card-kicker';
+			kickerElement.textContent = kicker;
+			const titleElement = document.createElement('h2');
+			titleElement.id = 'card-title';
+			titleElement.textContent = title;
+			const copyElement = document.createElement('p');
+			copyElement.className = 'card-copy';
+			copyElement.textContent = copy;
+			const button = document.createElement('button');
+			button.className = 'primary-button';
+			button.type = 'button';
+			button.textContent = buttonText;
+			button.addEventListener('click', action, { once: true });
+			card.append(kickerElement, titleElement, copyElement, button);
+			if (secondaryText && secondaryAction) {
+				const secondaryButton = document.createElement('button');
+				secondaryButton.className = 'secondary-button';
+				secondaryButton.type = 'button';
+				secondaryButton.textContent = secondaryText;
+				secondaryButton.addEventListener('click', secondaryAction, { once: true });
+				card.append(secondaryButton);
+			}
+			overlay.hidden = false;
+			button.focus();
+		}
+
+		function updateMenuSelection() {
+			document.querySelectorAll('[data-programming-level]').forEach((button) => {
+				button.setAttribute('aria-pressed', String(button.dataset.programmingLevel === programmingLevel));
+			});
+			document.querySelectorAll('[data-run-difficulty]').forEach((button) => {
+				button.setAttribute('aria-pressed', String(button.dataset.runDifficulty === runDifficulty));
+			});
+			programmingLevelLabel.textContent = programmingLevels[programmingLevel].label;
+			runSettingsLabel.textContent = `${programmingLevels[programmingLevel].label} · ${runDifficultyLabels[runDifficulty]} забег`;
+		}
+
+		function showMainMenu() {
+			if (animationFrame) cancelAnimationFrame(animationFrame);
+			clearQuestionTimer();
+			if (document.fullscreenElement === game) {
+				document.exitFullscreen().catch((error) => console.warn('Не удалось выйти из полноэкранного режима.', error));
+			}
+			immersiveFullscreen = false;
+			game.classList.remove('is-immersive');
+			resizeCanvas();
+			runner.jumpHeight = 0;
+			runner.jumpVelocity = 0;
+			runner.jumpTime = 0;
+			runner.jumping = false;
+			runner.sliding = false;
+			runner.slideTime = 0;
+			slideButton.classList.remove('is-active');
+			state = 'ready';
+			leftButton.disabled = true;
+			jumpButton.disabled = true;
+			slideButton.disabled = true;
+			rightButton.disabled = true;
+			pauseButton.disabled = true;
+			updateMenuSelection();
+			overlay.hidden = true;
+			showHubPage('home');
+		}
+
+		function openQuestion(rescueProgress = 0) {
+			state = 'rescue';
+			leftButton.disabled = true;
+			jumpButton.disabled = true;
+			slideButton.disabled = true;
+			rightButton.disabled = true;
+			activeQuestionButtons = [];
+			const question = questions[questionIndex % questions.length];
+			questionIndex += 1;
+			card.replaceChildren();
+
+			const kicker = document.createElement('p');
+			kicker.className = 'card-kicker';
+			kicker.textContent = `${programmingLevels[programmingLevel].label} · спасение жизни · ${rescueProgress + 1} из 3`;
+			const title = document.createElement('h2');
+			title.id = 'card-title';
+			title.textContent = question.question;
+			const answers = document.createElement('div');
+			answers.className = 'answers';
+			answers.setAttribute('role', 'group');
+			answers.setAttribute('aria-label', 'Варианты ответа');
+			const timer = document.createElement('div');
+			timer.className = 'question-timer';
+			timer.setAttribute('role', 'timer');
+			timer.setAttribute('aria-label', `На ответ осталось ${questionTimeLimit} секунд`);
+			const timerLabel = document.createElement('div');
+			timerLabel.className = 'question-timer-label';
+			const timerCaption = document.createElement('span');
+			timerCaption.textContent = 'Время на ответ';
+			const timerValue = document.createElement('span');
+			timerValue.textContent = `${questionTimeLimit} сек`;
+			timerLabel.append(timerCaption, timerValue);
+			const timerTrack = document.createElement('div');
+			timerTrack.className = 'question-timer-track';
+			const timerFill = document.createElement('div');
+			timerFill.className = 'question-timer-fill';
+			timerTrack.append(timerFill);
+			timer.append(timerLabel, timerTrack);
+			const hint = document.createElement('p');
+			hint.className = 'answer-hint';
+			hint.textContent = 'Нажмите 1–4 или выберите вариант';
+			const feedback = document.createElement('p');
+			feedback.className = 'feedback';
+			feedback.setAttribute('aria-live', 'polite');
+			let answered = false;
+
+			const submitAnswer = (answerIndex) => {
+				if (answered) return;
+				answered = true;
+				clearQuestionTimer();
+				answers.querySelectorAll('button').forEach((choice) => { choice.disabled = true; });
+				const timedOut = answerIndex < 0;
+				const correct = answerIndex === question.correct;
+				if (correct) {
+					answers.children[answerIndex].classList.add('is-correct');
+					feedback.textContent = rescueProgress === 2
+						? 'Верно! Жизнь спасена!'
+						: `Верно! Осталось вопросов: ${2 - rescueProgress}`;
+				} else {
+					if (!timedOut) answers.children[answerIndex].classList.add('is-wrong');
+					answers.children[question.correct].classList.add('is-correct');
+					lives -= 1;
+					feedback.textContent = `${timedOut ? 'Время вышло. ' : ''}Жизнь потеряна. Правильный ответ: ${question.answers[question.correct]}`;
+				}
+				updateDisplay();
+				window.setTimeout(() => {
+					if (lives <= 0) {
+						endGame();
+						return;
+					}
+					if (!correct) {
+						resumeGame();
+					} else if (rescueProgress < 2) {
+						openQuestion(rescueProgress + 1);
+					} else {
+						resumeGame();
+					}
+				}, 1100);
+			};
+
+			question.answers.forEach((answer, index) => {
+				const button = document.createElement('button');
+				button.className = 'answer-button';
+				button.type = 'button';
+				button.textContent = `${index + 1}. ${answer}`;
+				button.setAttribute('aria-label', `Вариант ${index + 1}: ${answer}`);
+				button.addEventListener('click', () => submitAnswer(index));
+				activeQuestionButtons.push(button);
+				answers.append(button);
+			});
+			card.append(kicker, title, timer, answers, hint, feedback);
+			overlay.hidden = false;
+			activeQuestionButtons[0].focus();
+			const questionStartedAt = performance.now();
+			questionTimer = window.setInterval(() => {
+				const remaining = Math.max(0, questionTimeLimit - (performance.now() - questionStartedAt) / 1000);
+				timerValue.textContent = `${remaining.toFixed(1)} сек`;
+				timer.setAttribute('aria-label', `На ответ осталось ${remaining.toFixed(1)} секунд`);
+				timerFill.style.width = `${(remaining / questionTimeLimit) * 100}%`;
+				timerFill.classList.toggle('is-low', remaining <= 5);
+				if (remaining <= 0) submitAnswer(-1);
+			}, 100);
+		}
+
+		function resumeGame() {
+			if (state !== 'rescue' && state !== 'paused') return;
+			state = 'running';
+			overlay.hidden = true;
+			leftButton.disabled = false;
+			jumpButton.disabled = false;
+			slideButton.disabled = false;
+			rightButton.disabled = false;
+			pauseButton.disabled = false;
+			lastFrame = performance.now();
+			animationFrame = requestAnimationFrame(gameLoop);
+		}
+
+		function endGame() {
+			if (state === 'gameover') return;
+			clearQuestionTimer();
+			state = 'gameover';
+			leftButton.disabled = true;
+			jumpButton.disabled = true;
+			slideButton.disabled = true;
+			rightButton.disabled = true;
+			pauseButton.disabled = true;
+			const score = currentScore();
+			if (score > bestScore) {
+				bestScore = score;
+				saveBestDistance(bestScore);
+			}
+			saveGameResult(score);
+			updateDisplay();
+			renderHub();
+			showOverlay(
+				'Забег окончен',
+				`Твой счёт: ${score}`,
+				`Лучший результат: ${bestScore}. Комбо в этом забеге: ×${bestCombo}. ${programmingLevels[programmingLevel].label}, ${runDifficultyLabels[runDifficulty].toLowerCase()} забег.`,
+				'Играть снова',
+				startGame,
+				'Выбрать настройки',
+				showMainMenu
+			);
+		}
+
+		function changeLane(direction) {
+			if (state !== 'running') return;
+			runner.lane = Math.min(laneCount - 1, Math.max(0, runner.lane + direction));
+		}
+
+		function jump() {
+			if (state !== 'running' || runner.jumping) return;
+			runner.slideTime = 0;
+			runner.sliding = false;
+			runner.jumping = true;
+			runner.jumpHeight = 0;
+			runner.jumpVelocity = -420;
+			runner.jumpTime = 0;
+		}
+
+		function slide() {
+			if (state !== 'running' || runner.jumping) return;
+			runner.sliding = true;
+			runner.slideTime = slideDuration;
+		}
+
+		function showPrize(message) {
+			prizeToast.textContent = message;
+			prizeToast.classList.add('is-visible');
+			window.clearTimeout(toastTimer);
+			toastTimer = window.setTimeout(() => prizeToast.classList.remove('is-visible'), 1500);
+		}
+
+		function handleGameSwipe(startX, startY, endX, endY) {
+			if (state !== 'running') return;
+			const deltaX = endX - startX;
+			const deltaY = endY - startY;
+			if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 30) return;
+			if (Math.abs(deltaX) > Math.abs(deltaY)) {
+				changeLane(deltaX < 0 ? -1 : 1);
+			} else if (deltaY < 0) {
+				jump();
+			} else {
+				slide();
+			}
+		}
+
+		canvas.addEventListener('pointerdown', (event) => {
+			if (state !== 'running') return;
+			event.preventDefault();
+			touchStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+			canvas.setPointerCapture(event.pointerId);
+		});
+		canvas.addEventListener('pointerup', (event) => {
+			if (!touchStart || event.pointerId !== touchStart.pointerId) return;
+			handleGameSwipe(touchStart.x, touchStart.y, event.clientX, event.clientY);
+			touchStart = null;
+		});
+		canvas.addEventListener('pointercancel', () => { touchStart = null; });
+
+		document.querySelectorAll('[data-open-page]').forEach((control) => {
+			control.addEventListener('click', (event) => {
+				event.preventDefault();
+				showHubPage(control.dataset.openPage);
+			});
+		});
+		document.querySelector('#hub-play-button').addEventListener('click', startGame);
+		document.querySelector('#settings-play-button').addEventListener('click', startGame);
+		document.querySelector('#save-profile').addEventListener('click', () => {
+			playerStats.name = profileNameInput.value.trim().slice(0, 20) || 'Бегун';
+			profileNameInput.value = playerStats.name === 'Бегун' ? '' : playerStats.name;
+			savePlayerStats();
+			renderHub();
+			showHubPage('profile');
+		});
+		document.querySelector('#skin-grid').addEventListener('click', (event) => {
+			const button = event.target.closest('button[data-skin-id]');
+			if (!button) return;
+			const skin = runnerSkins.find((item) => item.id === button.dataset.skinId);
+			if (!skin) return;
+			if (cosmetics.owned.includes(skin.id)) {
+				cosmetics.selected = skin.id;
+			} else {
+				if (walletCoins < skin.price) return;
+				walletCoins -= skin.price;
+				cosmetics.coins = walletCoins;
+				cosmetics.owned.push(skin.id);
+				cosmetics.selected = skin.id;
+			}
+			saveCosmetics();
+			renderShop();
+		});
+
+		leftButton.addEventListener('click', () => changeLane(-1));
+		jumpButton.addEventListener('click', jump);
+		slideButton.addEventListener('click', slide);
+		rightButton.addEventListener('click', () => changeLane(1));
+		primaryButton.addEventListener('click', startGame);
+		document.querySelectorAll('[data-programming-level]').forEach((button) => {
+			button.addEventListener('click', () => {
+				programmingLevel = button.dataset.programmingLevel;
+				questions = questionBanks[programmingLevel];
+				updateMenuSelection();
+			});
+		});
+		document.querySelectorAll('[data-run-difficulty]').forEach((button) => {
+			button.addEventListener('click', () => {
+				runDifficulty = button.dataset.runDifficulty;
+				updateMenuSelection();
+			});
+		});
+		pauseButton.addEventListener('click', () => {
+			if (state === 'running') {
+				state = 'paused';
+				leftButton.disabled = true;
+				jumpButton.disabled = true;
+				slideButton.disabled = true;
+				rightButton.disabled = true;
+				pauseButton.disabled = true;
+				showOverlay(
+					'Небольшая пауза',
+					'Передохни',
+					'Забег сохранён на паузе. Можно продолжить или вернуться к настройкам.',
+					'Продолжить',
+					resumeGame,
+					'В главное меню',
+					showMainMenu
+				);
+			}
+		});
+		document.addEventListener('keydown', (event) => {
+			if (state === 'rescue') {
+				const answerNumber = Number(event.key);
+				if (Number.isInteger(answerNumber) && answerNumber >= 1 && answerNumber <= activeQuestionButtons.length) {
+					event.preventDefault();
+					activeQuestionButtons[answerNumber - 1].click();
+					return;
+				}
+			}
+			if (state === 'running' && (event.code === 'ArrowLeft' || event.code === 'KeyA')) {
+				event.preventDefault();
+				changeLane(-1);
+			}
+			if (state === 'running' && (event.code === 'ArrowRight' || event.code === 'KeyD')) {
+				event.preventDefault();
+				changeLane(1);
+			}
+			if (state === 'running' && (event.code === 'Space' || event.code === 'ArrowUp' || event.code === 'KeyW')) {
+				event.preventDefault();
+				jump();
+			}
+			if (state === 'running' && (event.code === 'ArrowDown' || event.code === 'KeyS')) {
+				event.preventDefault();
+				slide();
+			}
+			if (event.code === 'Escape' && state === 'running') pauseButton.click();
+		});
+		document.addEventListener('visibilitychange', () => {
+			if (document.hidden && state === 'running') pauseButton.click();
+		});
+		document.addEventListener('fullscreenchange', () => {
+			if (!document.fullscreenElement && immersiveFullscreen && game.classList.contains('is-immersive')) {
+				immersiveFullscreen = false;
+				game.classList.remove('is-immersive');
+				if (state === 'running') pauseButton.click();
+			}
+			resizeCanvas();
+		});
+		window.addEventListener('resize', resizeCanvas);
+
+		settingsContent.append(mainMenuContent);
+		overlay.hidden = true;
+		resizeCanvas();
+		drawScene();
+		updateDisplay();
+		updateMenuSelection();
+		showHubPage('home');
+		if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('./sw.js')
+					.catch((error) => console.warn('Не удалось включить офлайн-режим игры.', error));
+			});
+		}
+	</script>
+</body>
+</html>

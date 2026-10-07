@@ -1,0 +1,8 @@
+node_modules/
+desktop-dist/
+app/www/
+android/.gradle/
+android/build/
+android/app/build/
+ios/build/
+ios/DerivedData/
